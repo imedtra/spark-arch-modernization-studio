@@ -887,8 +887,8 @@ function renderTab1OverviewAndInfra(data) {
             <span><strong>Provisioned vCPU Cores:</strong> ${ro.cores_before.toLocaleString()} Before &rarr; <strong class="emerald-text">${ro.cores_after.toLocaleString()} Right-Sized on GCE C4/N4</strong></span>
             <strong class="emerald-text">-${ro.cores_reduction_pct}% Cores Reduction (-${ro.cores_reduced.toLocaleString()} cores)</strong>
           </div>
-          <div style="height:12px; background:rgba(255,255,255,0.08); border-radius:999px; overflow:hidden; display:flex;">
-            <div style="width:${100 - ro.cores_reduction_pct}%; background:linear-gradient(90deg, #06b6d4, #10b981);"></div>
+          <div style="height:12px; background:var(--bg-elevated); border:1px solid var(--border-subtle); border-radius:999px; overflow:hidden; display:flex;">
+            <div style="width:${100 - ro.cores_reduction_pct}%; background:linear-gradient(90deg, #4285F4, #34A853);"></div>
           </div>
         </div>
 
@@ -898,18 +898,18 @@ function renderTab1OverviewAndInfra(data) {
             <span><strong>Provisioned Memory (RAM):</strong> ${ro.memory_before_tb} TB Before &rarr; <strong class="emerald-text">${ro.memory_after_tb} TB Right-Sized</strong></span>
             <strong class="emerald-text">-${ro.memory_reduction_pct}% Memory Reduction (-${ro.memory_reduced_tb} TB)</strong>
           </div>
-          <div style="height:12px; background:rgba(255,255,255,0.08); border-radius:999px; overflow:hidden; display:flex;">
-            <div style="width:${100 - ro.memory_reduction_pct}%; background:linear-gradient(90deg, #10b981, #3b82f6);"></div>
+          <div style="height:12px; background:var(--bg-elevated); border:1px solid var(--border-subtle); border-radius:999px; overflow:hidden; display:flex;">
+            <div style="width:${100 - ro.memory_reduction_pct}%; background:linear-gradient(90deg, #34A853, #4285F4);"></div>
           </div>
         </div>
 
         <!-- Storage Hyperdisk Upgrade -->
-        <div style="padding:0.75rem; background:rgba(6,182,212,0.07); border:1px solid rgba(6,182,212,0.25); border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+        <div style="padding:0.75rem; background:var(--bg-elevated); border:1px solid var(--border-subtle); border-left:4px solid #4285F4; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
           <div>
             <div style="font-size:0.84rem; font-weight:700; color:var(--text-primary);">Storage Architecture Modernization: ${ro.storage_allocated_tb} TB Allocated</div>
             <div style="font-size:0.76rem; color:var(--text-secondary);">Upgraded from legacy VMware SAN/NAS to <strong>${ro.storage_target_type}</strong> with dynamic IOPS/throughput provisioning.</div>
           </div>
-          <span class="badge-6r badge-cyan">100% Hyperdisk</span>
+          <span class="badge-6r badge-blue">100% Hyperdisk</span>
         </div>
       </div>
     `;
@@ -938,7 +938,7 @@ function renderTab1OverviewAndInfra(data) {
     if (c.risky_port && c.internet_exposed) {
       riskBadge = `<span class="badge-6r badge-rose">CRITICAL: Public RDP Jump Host &rarr; Replace with Cloud IAP</span>`;
     } else if (c.internet_exposed) {
-      riskBadge = `<span class="badge-6r badge-cyan">Internet Ingress &rarr; Protect with Cloud Armor L7 WAF</span>`;
+      riskBadge = `<span class="badge-6r badge-blue">Internet Ingress &rarr; Protect with Cloud Armor L7 WAF</span>`;
     } else if (c.cross_wave) {
       riskBadge = `<span class="badge-6r badge-amber">Cross-Wave Flow &rarr; Requires 100 Gbps GCVE-GCE Shared VPC</span>`;
     }
@@ -949,7 +949,7 @@ function renderTab1OverviewAndInfra(data) {
         <td><strong>${c.dest_vm}</strong></td>
         <td class="mono-cell">${c.dest_ip}</td>
         <td class="mono-cell">${c.port} / ${c.proto}</td>
-        <td class="mono-cell" style="color:#06b6d4;">${c.process}</td>
+        <td class="mono-cell" style="color:#1a73e8; font-weight:600;">${c.process}</td>
         <td>${riskBadge}</td>
       </tr>
     `;
@@ -962,18 +962,21 @@ function renderTab1OverviewAndInfra(data) {
 function renderTab2DomainsAndWorkloads(data) {
   const td = data.technology_domains;
   const domainsGrid = document.getElementById('tech-domains-grid');
+  const gColors = ['#4285F4', '#EA4335', '#FBBC05', '#34A853', '#1a73e8'];
 
   if (td && td.domains) {
-    domainsGrid.innerHTML = td.domains.map((dom) => `
-      <article class="domain-card">
+    domainsGrid.innerHTML = td.domains.map((dom, idx) => {
+      const c = gColors[idx % gColors.length];
+      return `
+      <article class="domain-card" style="border-top: 4px solid ${c};">
         <div class="domain-card-header">
           <div>
             <div class="domain-title">${dom.name}</div>
-            <div style="font-size:0.74rem; color:var(--text-secondary);">${dom.products_count} Products • ${dom.installations_count} Installs</div>
+            <div style="font-size:0.74rem; color:var(--text-secondary);">${dom.products_count} Products &bull; ${dom.installations_count} Installs</div>
           </div>
-          <span class="badge-6r badge-cyan">${dom.primary_motion}</span>
+          <span class="badge-6r badge-blue">${dom.primary_motion}</span>
         </div>
-        <div style="font-size:0.76rem; color:#10b981; font-weight:600;">Consolidation: ${dom.consolidation_potential}</div>
+        <div style="font-size:0.76rem; color:#34A853; font-weight:700;">Consolidation: ${dom.consolidation_potential}</div>
         <div style="font-size:0.74rem; color:var(--text-secondary); margin-top:0.25rem;">Discovered Products (Red = EOL):</div>
         <div class="domain-product-tags">
           ${dom.top_products.map(p => `
@@ -982,17 +985,18 @@ function renderTab2DomainsAndWorkloads(data) {
             </span>
           `).join('')}
         </div>
-        <div style="margin-top:auto; padding-top:0.55rem; border-top:1px solid rgba(255,255,255,0.06);">
+        <div style="margin-top:auto; padding-top:0.55rem; border-top:1px solid var(--border-subtle);">
           <div style="font-size:0.72rem; color:var(--text-secondary); margin-bottom:0.3rem;">Prescribed Google Cloud Targets:</div>
           ${dom.top_gcp_targets.map(t => `
             <div style="display:flex; justify-content:space-between; font-size:0.76rem; color:var(--text-primary);">
               <span>&rarr; ${t.service}</span>
-              <strong class="cyan-text">${t.candidates} workloads</strong>
+              <strong style="color:#1a73e8;">${t.candidates} workloads</strong>
             </div>
           `).join('')}
         </div>
       </article>
-    `).join('');
+    `;
+    }).join('');
   } else {
     domainsGrid.innerHTML = '';
   }
@@ -1015,10 +1019,10 @@ function renderTab2DomainsAndWorkloads(data) {
     return `
       <tr>
         <td>
-          <a href="javascript:void(0)" class="workload-name-link" data-wl-id="${wl.id}" style="color:#06b6d4; font-weight:700; text-decoration:underline; font-size:0.88rem;">
+          <a href="javascript:void(0)" class="workload-name-link" data-wl-id="${wl.id}" style="color:#1a73e8; font-weight:700; text-decoration:underline; font-size:0.88rem;">
             ${wl.name} &#8599;
           </a>
-          <div class="workload-tier">${wl.tier} • Criticality: ${wl.criticality}</div>
+          <div class="workload-tier">${wl.tier} &bull; Criticality: ${wl.criticality}</div>
         </td>
         <td>
           <div style="font-weight:500; color:var(--text-primary);">${wl.source_tech}</div>
@@ -1026,7 +1030,7 @@ function renderTab2DomainsAndWorkloads(data) {
         </td>
         <td class="mono-cell">
           <strong>${wl.servers} VMs</strong><br>
-          <span style="font-size:0.74rem; color:var(--text-secondary);">${wl.vcpu} vCPU • ${wl.ram_gb} GB RAM</span>
+          <span style="font-size:0.74rem; color:var(--text-secondary);">${wl.vcpu} vCPU &bull; ${wl.ram_gb} GB RAM</span>
         </td>
         <td>
           <div class="mono-cell">P95 CPU: <strong>${wl.cpu_utilization_p95}%</strong></div>
@@ -1039,19 +1043,19 @@ function renderTab2DomainsAndWorkloads(data) {
             ).join('')}
           </select>
           <div style="margin-top:0.3rem; display:flex; gap:0.3rem; flex-wrap:wrap;">
-            <span class="badge-6r badge-cyan" style="font-size:0.68rem;">🤖 ${wl.ai_confidence_pct || 94}% AI Conf.</span>
-            <span class="badge-6r badge-indigo" style="font-size:0.68rem;">${wl.recommended_wave || 'Wave 2'}</span>
+            <span class="badge-6r badge-blue" style="font-size:0.68rem;">🤖 ${wl.ai_confidence_pct || 94}% AI Conf.</span>
+            <span class="badge-6r badge-emerald" style="font-size:0.68rem;">${wl.recommended_wave || 'Wave 2'}</span>
           </div>
         </td>
         <td>
           <input type="text" class="table-select wl-gcp-input" data-id="${wl.id}" value="${wl.active_gcp_service}" style="width:100%; min-width:220px;">
-          <div style="font-size:0.74rem; color:#38bdf8; font-family:'JetBrains Mono', monospace; margin-top:0.28rem;">
+          <div style="font-size:0.74rem; color:#1a73e8; font-family:var(--font-mono); margin-top:0.28rem;">
             <strong>Right-Sized SKU:</strong> ${wl.rightsized_sku || 'Gen4 c4-standard-8 (Hyperdisk Balanced)'}
           </div>
           <div style="font-size:0.73rem; color:var(--text-secondary); margin-top:0.2rem;">${wl.target_rationale}</div>
         </td>
         <td class="mono-cell">
-          <div style="font-size:0.9rem; font-weight:700; color:#10b981;">${fmtUSD(wl.target_annual_cost_usd)}/yr</div>
+          <div style="font-size:0.9rem; font-weight:700; color:#34A853;">${fmtUSD(wl.target_annual_cost_usd)}/yr</div>
           <div style="font-size:0.74rem; color:var(--text-secondary);">Save ${fmtUSD(wl.annual_savings_usd)}/yr (-${wl.savings_pct}%)</div>
         </td>
       </tr>
@@ -1105,24 +1109,24 @@ function openAppDetailModal(wl) {
   const body = document.getElementById('app-modal-body');
   body.innerHTML = `
     <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:0.85rem; margin-bottom:1.25rem;">
-      <div class="card-panel" style="padding:0.85rem;">
+      <div class="card-panel" style="padding:0.85rem; border-top:4px solid #4285F4;">
         <div style="font-size:0.72rem; color:var(--text-secondary); text-transform:uppercase;">Server Environment Split</div>
         <div style="font-size:1.25rem; font-weight:700; color:var(--text-primary); margin-top:0.25rem;">${wl.servers} Total VMs</div>
-        <div style="font-size:0.76rem; color:#06b6d4;">${prodServers} Prod • ${nonProdServers} Non-Prod (175h/mo)</div>
+        <div style="font-size:0.76rem; color:#1a73e8;">${prodServers} Prod &bull; ${nonProdServers} Non-Prod (175h/mo)</div>
       </div>
-      <div class="card-panel" style="padding:0.85rem;">
+      <div class="card-panel" style="padding:0.85rem; border-top:4px solid #EA4335;">
         <div style="font-size:0.72rem; color:var(--text-secondary); text-transform:uppercase;">OS &amp; App Stack EOL Risk</div>
-        <div style="font-size:1.25rem; font-weight:700; color:#fb7185; margin-top:0.25rem;">${wl.eol_risk} Risk</div>
+        <div style="font-size:1.25rem; font-weight:700; color:#EA4335; margin-top:0.25rem;">${wl.eol_risk} Risk</div>
         <div style="font-size:0.76rem; color:var(--text-secondary);">${wl.app_stack_eol_count || 2} EOL Software Packages</div>
       </div>
-      <div class="card-panel" style="padding:0.85rem;">
+      <div class="card-panel" style="padding:0.85rem; border-top:4px solid #FBBC05;">
         <div style="font-size:0.72rem; color:var(--text-secondary); text-transform:uppercase;">Network Dependencies</div>
         <div style="font-size:1.25rem; font-weight:700; color:var(--text-primary); margin-top:0.25rem;">${wl.inbound_deps || 2} In / ${wl.outbound_deps || 1} Out</div>
-        <div style="font-size:0.76rem; color:#10b981;">100 Gbps Shared VPC Ready</div>
+        <div style="font-size:0.76rem; color:#34A853;">100 Gbps Shared VPC Ready</div>
       </div>
-      <div class="card-panel" style="padding:0.85rem;">
+      <div class="card-panel" style="padding:0.85rem; border-top:4px solid #34A853;">
         <div style="font-size:0.72rem; color:var(--text-secondary); text-transform:uppercase;">Prescribed 6R Strategy</div>
-        <div style="font-size:1.25rem; font-weight:700; color:#10b981; margin-top:0.25rem;">${wl.active_6r}</div>
+        <div style="font-size:1.25rem; font-weight:700; color:#34A853; margin-top:0.25rem;">${wl.active_6r}</div>
         <div style="font-size:0.76rem; color:var(--text-secondary);">Est. Velocity: ${wl.estimated_weeks} Weeks</div>
       </div>
     </div>
@@ -1130,20 +1134,20 @@ function openAppDetailModal(wl) {
     <div class="card-panel" style="margin-bottom:1.25rem;">
       <h4 style="font-size:0.9rem; font-weight:700; color:var(--text-primary); margin-bottom:0.65rem;">3-Way Financial Comparison for ${wl.name} (Slide 5 Model)</h4>
       <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:1rem;">
-        <div style="padding:0.85rem; background:rgba(255,255,255,0.03); border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
+        <div style="padding:0.85rem; background:var(--bg-elevated); border-radius:8px; border:1px solid var(--border-subtle); border-top:3px solid #EA4335;">
           <div style="font-size:0.75rem; color:var(--text-secondary);">1. Current On-Premises Baseline</div>
           <div style="font-size:1.35rem; font-weight:700; color:var(--text-primary); margin:0.3rem 0;">${fmtUSD(wl.current_annual_cost_usd)} / yr</div>
           <div style="font-size:0.74rem; color:var(--text-secondary);">Hardware refresh, power, VMware licensing &amp; support</div>
         </div>
-        <div style="padding:0.85rem; background:rgba(6,182,212,0.06); border-radius:8px; border:1px solid rgba(6,182,212,0.25);">
-          <div style="font-size:0.75rem; color:#06b6d4;">2. IaaS Rehost (Right-Sized + 3-Yr CUD)</div>
-          <div style="font-size:1.35rem; font-weight:700; color:#06b6d4; margin:0.3rem 0;">${fmtUSD(rehostCost)} / yr</div>
+        <div style="padding:0.85rem; background:var(--bg-elevated); border-radius:8px; border:1px solid var(--border-subtle); border-top:3px solid #4285F4;">
+          <div style="font-size:0.75rem; color:#1a73e8; font-weight:600;">2. IaaS Rehost (Right-Sized + 3-Yr CUD)</div>
+          <div style="font-size:1.35rem; font-weight:700; color:#1a73e8; margin:0.3rem 0;">${fmtUSD(rehostCost)} / yr</div>
           <div style="font-size:0.74rem; color:var(--text-secondary);">Lift &amp; shift to GCE C4 / GCVE with right-sized vCPU</div>
         </div>
-        <div style="padding:0.85rem; background:rgba(16,185,129,0.08); border-radius:8px; border:1px solid rgba(16,185,129,0.35);">
-          <div style="font-size:0.75rem; color:#10b981;">3. Recommended ${wl.active_6r} (${wl.active_gcp_service.split('+')[0]})</div>
-          <div style="font-size:1.35rem; font-weight:700; color:#10b981; margin:0.3rem 0;">${fmtUSD(paasCost)} / yr</div>
-          <div style="font-size:0.74rem; color:#10b981; font-weight:600;">Saves ${fmtUSD(wl.annual_savings_usd)}/yr (-${wl.savings_pct}%)</div>
+        <div style="padding:0.85rem; background:var(--bg-elevated); border-radius:8px; border:1px solid var(--border-subtle); border-top:3px solid #34A853;">
+          <div style="font-size:0.75rem; color:#34A853; font-weight:600;">3. Recommended ${wl.active_6r} (${wl.active_gcp_service.split('+')[0]})</div>
+          <div style="font-size:1.35rem; font-weight:700; color:#34A853; margin:0.3rem 0;">${fmtUSD(paasCost)} / yr</div>
+          <div style="font-size:0.74rem; color:#34A853; font-weight:600;">Saves ${fmtUSD(wl.annual_savings_usd)}/yr (-${wl.savings_pct}%)</div>
         </div>
       </div>
     </div>
@@ -1170,18 +1174,21 @@ function closeAppModal() {
 function renderTab3Databases(data) {
   const dbList = data.database_modernization || [];
   const grid = document.getElementById('db-engine-grid');
+  const gColors = ['#4285F4', '#EA4335', '#FBBC05', '#34A853', '#1a73e8'];
 
   if (dbList.length === 0) {
-    grid.innerHTML = `<div class="card-panel">Database deep-dive pathways are populated for the flagship  the Enterprise Estate estate.</div>`;
+    grid.innerHTML = `<div class="card-panel">Database deep-dive pathways are populated for the flagship Enterprise Estate.</div>`;
     return;
   }
 
-  grid.innerHTML = dbList.map((db) => `
-    <article class="db-engine-card">
+  grid.innerHTML = dbList.map((db, idx) => {
+    const c = gColors[idx % gColors.length];
+    return `
+    <article class="db-engine-card" style="border-top: 4px solid ${c};">
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <div>
           <h3 style="font-size:1.05rem; font-weight:700; color:var(--text-primary);">${db.engine} Estate</h3>
-          <div style="font-size:0.76rem; color:var(--text-secondary);">${db.servers} Discovered Servers • ${db.unique_versions} Versions</div>
+          <div style="font-size:0.76rem; color:var(--text-secondary);">${db.servers} Discovered Servers &bull; ${db.unique_versions} Versions</div>
         </div>
         <span class="badge-6r ${db.eol_servers > 0 ? 'badge-rose' : 'badge-emerald'}">
           ${db.eol_servers} EOL Servers
@@ -1192,32 +1199,33 @@ function renderTab3Databases(data) {
       <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.25rem;">Discovered Version Breakdown:</div>
       <div style="display:flex; flex-direction:column; gap:0.35rem;">
         ${db.versions.map(v => `
-          <div style="display:flex; justify-content:space-between; font-size:0.78rem; padding:0.3rem 0.5rem; background:rgba(255,255,255,0.02); border-radius:6px;">
-            <span>${v.ver}</span>
+          <div style="display:flex; justify-content:space-between; font-size:0.78rem; padding:0.35rem 0.6rem; background:var(--bg-elevated); border:1px solid var(--border-subtle); border-radius:6px;">
+            <span><strong>${v.ver}</strong></span>
             <span>
-              <strong class="mono-cell">${v.count} VMs</strong> •
-              <span style="color:${v.status === 'Out of Support' ? '#fb7185' : '#34d399'};">${v.status} (${v.eos})</span>
+              <strong class="mono-cell">${v.count} VMs</strong> &bull;
+              <span style="color:${v.status === 'Out of Support' ? '#EA4335' : '#34A853'}; font-weight:600;">${v.status} (${v.eos})</span>
             </span>
           </div>
         `).join('')}
       </div>
 
       <!-- Sankey Modernization Pathways -->
-      <div style="font-size:0.75rem; color:#06b6d4; font-weight:600; margin-top:0.35rem;">Prescribed Google Cloud Target Pathways:</div>
+      <div style="font-size:0.75rem; color:#1a73e8; font-weight:700; margin-top:0.35rem;">Prescribed Google Cloud Target Pathways:</div>
       ${db.pathways.map(pw => `
         <div class="db-pathway-bar">
           <div style="display:flex; justify-content:space-between; font-size:0.82rem; font-weight:700; color:var(--text-primary);">
             <span>&rarr; ${pw.target}</span>
-            <span class="emerald-text">${pw.share_pct}% of Fleet</span>
+            <span style="color:#34A853;">${pw.share_pct}% of Fleet</span>
           </div>
-          <div style="height:6px; background:rgba(255,255,255,0.08); border-radius:999px; overflow:hidden; margin:0.3rem 0;">
-            <div style="width:${pw.share_pct}%; height:100%; background:linear-gradient(90deg, #06b6d4, #10b981);"></div>
+          <div style="height:7px; background:var(--bg-elevated); border:1px solid var(--border-subtle); border-radius:999px; overflow:hidden; margin:0.3rem 0;">
+            <div style="width:${pw.share_pct}%; height:100%; background:linear-gradient(90deg, #4285F4, #34A853);"></div>
           </div>
           <div style="font-size:0.74rem; color:var(--text-secondary);">${pw.rationale}</div>
         </div>
       `).join('')}
     </article>
-  `).join('');
+  `;
+  }).join('');
 
   // Render Database Cost Matrix Table (Slide 27)
   const matrixTbody = document.getElementById('db-cost-matrix-tbody');
@@ -1366,24 +1374,36 @@ function renderTab4ScenariosAndCost(data) {
  * TAB 5: Dependency Waves (Slide 43) & 5-Pillar Google Cloud WAF Scorecard
  * ========================================================================== */
 function renderTab5WavesAndWAF(data) {
+  const waveColors = ['#4285F4', '#EA4335', '#FBBC05', '#34A853'];
   const wavesContainer = document.getElementById('waves-container');
-  wavesContainer.innerHTML = data.waves.map((w) => `
-    <article class="wave-card">
-      <div class="wave-meta">
-        <span class="wave-num">WAVE ${w.wave_number} • ${w.timeline}</span>
-        <div class="wave-title">${w.name}</div>
-        <p class="wave-focus">${w.focus}</p>
-      </div>
-      <div class="wave-workloads">
-        ${w.workloads.map((wl) => `
-          <div class="wave-item-chip">
-            <div class="wave-item-name">${wl.name}</div>
-            <div class="wave-item-target">${wl.active_6r} &rarr; ${wl.active_gcp_service}</div>
+  wavesContainer.innerHTML = data.waves.map((w, idx) => {
+    const gColor = waveColors[idx % waveColors.length];
+    return `
+      <article class="wave-card" style="border-top: 4px solid ${gColor};">
+        <div class="wave-meta">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:0.5rem; margin-bottom:0.35rem;">
+            <span class="wave-num" style="background:${gColor}18; color:${gColor === '#FBBC05' ? '#b06000' : gColor}; border:1px solid ${gColor}55;">
+              WAVE ${w.wave_number} &bull; ${w.timeline}
+            </span>
+            <span class="badge-6r badge-blue">${w.workloads.length} Apps</span>
           </div>
-        `).join('')}
-      </div>
-    </article>
-  `).join('');
+          <div class="wave-title">${w.name}</div>
+          <p class="wave-focus">${w.focus}</p>
+        </div>
+        <div class="wave-workloads">
+          ${w.workloads.map((wl) => `
+            <div class="wave-item-chip" style="border-left: 3px solid ${gColor};">
+              <div class="wave-item-name">${wl.name}</div>
+              <div class="wave-item-target">
+                <span class="badge-6r badge-${getBadgeColor(wl.active_6r)}" style="font-size:0.68rem; padding:1px 6px;">${wl.active_6r}</span>
+                <span>&rarr; ${wl.active_gcp_service}</span>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </article>
+    `;
+  }).join('');
 
   // Render Target Google Cloud 6R Landing Zone Architecture Blueprint (#tab6-architecture-diagram-box)
   const archBox = document.getElementById('tab6-architecture-diagram-box');
@@ -1396,42 +1416,42 @@ function renderTab5WavesAndWAF(data) {
     });
 
     const zoneMeta = {
-      'Replatform': { title: 'Managed Database & Compute Zone (Replatform)', icon: '🗄️', color: '#06b6d4', subnet: 'vpc-prod-data-compute (AlloyDB / Cloud SQL Ent+ / Gen4 C4)' },
-      'Refactor': { title: 'Cloud-Native Serverless & Kubernetes Zone (Refactor)', icon: '☸️', color: '#10b981', subnet: 'vpc-prod-cloudnative (GKE Autopilot / Cloud Run / PubSub)' },
-      'Rehost': { title: 'Dedicated VMware SDDC Zone (Rehost)', icon: '🖧', color: '#6366f1', subnet: 'vpc-prod-gcve (Google Cloud VMware Engine HCX L2)' },
-      'Replace': { title: 'Managed Security & SaaS Identity Zone (Replace)', icon: '🛡️', color: '#f59e0b', subnet: 'vpc-shared-security (Managed AD / CAS / Chronicle SecOps)' },
-      'Retire': { title: 'Decommission & Coldline Archive Vault (Retire)', icon: '🧊', color: '#f43f5e', subnet: 'gcs-compliance-vault (Cloud Storage Coldline + ILM)' }
+      'Replatform': { title: 'Managed Database & Compute Zone (Replatform)', icon: '🗄️', color: '#4285F4', badgeClass: 'badge-blue', subnet: 'vpc-prod-data-compute (AlloyDB / Cloud SQL Ent+ / Gen4 C4)' },
+      'Refactor': { title: 'Cloud-Native Serverless & GKE Zone (Refactor)', icon: '☸️', color: '#34A853', badgeClass: 'badge-emerald', subnet: 'vpc-prod-cloudnative (GKE Autopilot / Cloud Run / PubSub)' },
+      'Rehost': { title: 'Dedicated VMware SDDC Zone (Rehost)', icon: '🖧', color: '#1a73e8', badgeClass: 'badge-cyan', subnet: 'vpc-prod-gcve (Google Cloud VMware Engine HCX L2)' },
+      'Replace': { title: 'Managed Security & SaaS Identity Zone (Replace)', icon: '🛡️', color: '#FBBC05', badgeClass: 'badge-amber', subnet: 'vpc-shared-security (Managed AD / CAS / Chronicle SecOps)' },
+      'Retire': { title: 'Decommission & Coldline Archive Vault (Retire)', icon: '🧊', color: '#EA4335', badgeClass: 'badge-rose', subnet: 'gcs-compliance-vault (Cloud Storage Coldline + ILM)' }
     };
 
     archBox.innerHTML = `
-      <div class="panel-header" style="margin-bottom:0.85rem;">
+      <div class="panel-header" style="margin-bottom:0.95rem;">
         <div>
-          <span class="panel-kicker">Vertex AI 6R Target Architecture Blueprint • Cloud Foundation Fabric</span>
-          <h3 style="margin:0.15rem 0 0 0; font-size:1.05rem;">Target Google Cloud Hub-and-Spoke Landing Zone (Mapped by 6R Treatment)</h3>
+          <span class="badge-6r badge-blue" style="margin-bottom:0.35rem;">Vertex AI 6R Target Architecture Blueprint &bull; Cloud Foundation Fabric</span>
+          <h3 class="panel-title" style="margin:0.2rem 0 0 0; font-size:1.05rem;">Target Google Cloud Hub-and-Spoke Landing Zone (Mapped by 6R Treatment)</h3>
         </div>
-        <span class="badge-6r badge-cyan">Shared VPC + Cloud Armor WAF + KMS</span>
+        <span class="badge-6r badge-emerald">Shared VPC + Cloud Armor WAF + KMS</span>
       </div>
-      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:0.9rem;">
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:0.95rem;">
         ${Object.entries(by6R).map(([strat, list]) => {
-          const m = zoneMeta[strat] || { title: `${strat} Landing Zone`, icon: '☁️', color: '#38bdf8', subnet: 'vpc-prod-spoke' };
+          const m = zoneMeta[strat] || { title: `${strat} Landing Zone`, icon: '☁️', color: '#4285F4', badgeClass: 'badge-blue', subnet: 'vpc-prod-spoke' };
           return `
-            <div style="background:rgba(15,23,42,0.65); border:1px solid ${m.color}55; border-top:3px solid ${m.color}; border-radius:10px; padding:0.85rem;">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+            <div class="card-panel" style="padding:0.95rem; border-top:4px solid ${m.color}; margin-bottom:0;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem; gap:0.5rem;">
                 <strong style="font-size:0.86rem; color:var(--text-primary);">${m.icon} ${m.title}</strong>
-                <span class="badge-6r" style="background:${m.color}22; color:${m.color}; border:1px solid ${m.color}55;">${list.length} Apps</span>
+                <span class="badge-6r ${m.badgeClass}">${list.length} Apps</span>
               </div>
-              <div style="font-size:0.72rem; font-family:'JetBrains Mono', monospace; color:var(--text-secondary); margin-bottom:0.65rem;">
+              <div style="font-size:0.72rem; font-family:var(--font-mono); color:var(--text-secondary); margin-bottom:0.65rem; padding:3px 7px; background:var(--bg-elevated); border-radius:4px;">
                 Subnet: ${m.subnet}
               </div>
               <div style="display:flex; flex-direction:column; gap:0.45rem;">
                 ${list.map((w) => `
-                  <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:6px; padding:0.45rem 0.6rem;">
-                    <div style="display:flex; justify-content:space-between; font-size:0.79rem; font-weight:700; color:var(--text-primary);">
+                  <div style="background:var(--bg-elevated); border:1px solid var(--border-subtle); border-left:3px solid ${m.color}; border-radius:6px; padding:0.5rem 0.65rem;">
+                    <div style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight:700; color:var(--text-primary);">
                       <span>${w.name}</span>
-                      <span style="color:#10b981;">${fmtUSD(w.target_annual_cost_usd)}/yr</span>
+                      <span style="color:#34A853;">${fmtUSD(w.target_annual_cost_usd)}/yr</span>
                     </div>
-                    <div style="font-size:0.73rem; color:#38bdf8; margin-top:0.15rem;">&rarr; ${w.active_gcp_service}</div>
-                    <div style="font-size:0.69rem; color:var(--text-secondary); font-family:'JetBrains Mono', monospace; margin-top:0.12rem;">SKU: ${w.rightsized_sku || 'Gen4 C4'}</div>
+                    <div style="font-size:0.74rem; color:#1a73e8; font-weight:600; margin-top:0.15rem;">&rarr; ${w.active_gcp_service}</div>
+                    <div style="font-size:0.7rem; color:var(--text-secondary); font-family:var(--font-mono); margin-top:0.12rem;">SKU: ${w.rightsized_sku || 'Gen4 C4'}</div>
                   </div>
                 `).join('')}
               </div>
@@ -1442,38 +1462,47 @@ function renderTab5WavesAndWAF(data) {
     `;
   }
 
-  // WAF Scorecard
+  // WAF Scorecard with Google 4-Color Pillar Accents
   const waf = data.waf_audit;
-  document.getElementById('waf-overall-badge').textContent = `Overall Compliance: ${waf.overall_score_pct}%`;
+  document.getElementById('waf-overall-badge').textContent = `Overall Google WAF Compliance: ${waf.overall_score_pct}%`;
 
+  const pillarColors = ['#4285F4', '#EA4335', '#FBBC05', '#34A853', '#1a73e8'];
   const pillarsGrid = document.getElementById('waf-pillars-grid');
-  pillarsGrid.innerHTML = waf.pillars.map((p) => `
-    <div class="waf-pillar-card">
-      <div class="waf-pillar-name">${p.pillar}</div>
-      <div class="waf-pillar-score" style="color:${p.score_pct >= 85 ? '#10b981' : '#f59e0b'}">${p.score_pct}%</div>
-    </div>
-  `).join('');
+  pillarsGrid.innerHTML = waf.pillars.map((p, idx) => {
+    const pColor = pillarColors[idx % pillarColors.length];
+    const scoreColor = p.score_pct >= 80 ? '#34A853' : (p.score_pct >= 65 ? '#4285F4' : '#EA4335');
+    return `
+      <div class="waf-pillar-card" style="border-top: 4px solid ${pColor};">
+        <div class="waf-pillar-name">${p.pillar}</div>
+        <div class="waf-pillar-score" style="color:${scoreColor};">${p.score_pct}%</div>
+        <div style="height:6px; background:var(--bg-elevated); border-radius:999px; overflow:hidden; margin-top:0.4rem;">
+          <div style="width:${p.score_pct}%; height:100%; background:${pColor}; border-radius:999px;"></div>
+        </div>
+      </div>
+    `;
+  }).join('');
 
   const controlsList = document.getElementById('waf-controls-list');
-  controlsList.innerHTML = waf.controls.map((c) => {
+  controlsList.innerHTML = waf.controls.map((c, idx) => {
     const isPass = c.status === 'PASS';
+    const accent = isPass ? '#34A853' : pillarColors[idx % pillarColors.length];
     return `
-      <div class="waf-control-card">
+      <div class="waf-control-card" style="border-left: 4px solid ${accent};">
         <div class="waf-control-left">
-          <div style="display:flex; align-items:center; gap:0.65rem;">
+          <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap; margin-bottom:0.25rem;">
             <span class="badge-6r ${isPass ? 'badge-emerald' : 'badge-amber'}">${c.status}</span>
             <span class="waf-control-title">${c.title}</span>
-            <span style="font-size:0.75rem; color:var(--text-secondary);">(${c.pillar})</span>
+            <span class="badge-6r badge-blue" style="font-size:0.7rem;">${c.pillar}</span>
           </div>
-          <p class="waf-control-desc"><strong>Finding:</strong> ${c.finding}</p>
-          <p class="waf-control-desc" style="color:#06b6d4;"><strong>Target Remediation:</strong> ${c.remediation}</p>
+          <p class="waf-control-desc"><strong>Discovery Finding:</strong> ${c.finding}</p>
+          <p class="waf-control-desc" style="color:#1a73e8; font-weight:600;"><strong>Google Cloud Remediation:</strong> ${c.remediation}</p>
         </div>
-        <div>
+        <div style="flex-shrink:0;">
           ${isPass ? `
-            <span class="badge-6r badge-emerald">Compliant</span>
+            <span class="badge-6r badge-emerald">&#10003; Compliant</span>
           ` : `
-            <button class="btn btn-primary btn-remediate" data-id="${c.id}">
-              Apply AI Remediation (+${Math.round(c.score_impact * 0.55)}% Score)
+            <button class="btn btn-primary btn-remediate" data-id="${c.id}" style="background:#4285F4; border-color:#4285F4;">
+              &#10024; Apply AI Remediation (+${Math.round(c.score_impact * 0.55)}%)
             </button>
           `}
         </div>

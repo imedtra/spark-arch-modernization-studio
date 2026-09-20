@@ -13,70 +13,66 @@
   <!-- Google 4-Color Top Brand Ribbon -->
   <div style="height:5px; width:100%; background:linear-gradient(90deg, #4285F4 0% 25%, #EA4335 25% 50%, #FBBC05 50% 75%, #34A853 75% 100%); position:sticky; top:0; z-index:1001;"></div>
 
-  <!-- Sticky Executive Top Navigation -->
-  <header class="app-header" style="border-bottom: 1px solid #d2e3fc; background: linear-gradient(90deg, rgba(66,133,244,0.08) 0%, rgba(234,67,53,0.05) 35%, rgba(251,188,5,0.06) 70%, rgba(52,168,83,0.08) 100%);">
-    <div class="brand-cluster">
-      <div class="brand-logo" aria-hidden="true" style="background:#ffffff; border:1px solid #d2e3fc; box-shadow:0 2px 6px rgba(66,133,244,0.15);">
-        <svg width="24" height="24" viewBox="0 0 48 48">
+  <!-- Compact Google Blue Executive Toolbar (No Big White Banner) -->
+  <header class="app-header" style="background:linear-gradient(90deg, #1a73e8 0%, #1557b0 60%, #174ea6 100%); border-bottom:2px solid #fbba05; padding:6px 20px; min-height:48px; color:#ffffff; box-shadow:0 3px 12px rgba(26,115,232,0.22);">
+    <div class="brand-cluster" style="display:flex; align-items:center; gap:10px;">
+      <div class="brand-logo" aria-hidden="true" style="width:32px; height:32px; border-radius:8px; background:#ffffff; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(0,0,0,0.18); flex-shrink:0;">
+        <svg width="20" height="20" viewBox="0 0 48 48">
           <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
           <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
           <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
           <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
         </svg>
       </div>
-      <div>
-        <div class="brand-title" style="display:flex; align-items:center; gap:6px;">
-          <span><b style="color:#4285F4">G</b><b style="color:#EA4335">o</b><b style="color:#FBBC05">o</b><b style="color:#4285F4">g</b><b style="color:#34A853">l</b><b style="color:#EA4335">e</b> Cloud</span>
-          <span style="color:var(--text-primary); font-weight:700;">&bull; SPARK Modernization Studio</span>
-          <span class="badge-pill" style="background:#e8f0fe; color:#1967d2; border:1px solid #aecbfa;">Gemini 3.8</span>
-        </div>
-        <div class="brand-subtitle">Automated Discovery, 6R Target Architecture &amp; Financial TCO Modeling</div>
+      <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+        <span style="font-size:14.5px; font-weight:700; color:#ffffff; letter-spacing:-0.01em;">Google Cloud &bull; SPARK Modernization Studio</span>
+        <span style="background:#FBBC05; color:#0f172a; font-size:11px; font-weight:700; padding:2px 8px; border-radius:999px;">Gemini 3.8</span>
       </div>
     </div>
 
     <div class="header-controls" style="display:flex; align-items:center; gap:0.45rem;">
-      <button id="btn-header-ai-6r" class="btn btn-primary" style="background:linear-gradient(135deg, #4285F4, #1a73e8); border-color:#1a73e8; font-size:12px; padding:5px 11px; box-shadow:0 2px 6px rgba(66,133,244,0.25);" title="Run Vertex AI 6R Target Recommender Agent">
+      <button id="btn-header-ai-6r" class="btn" style="background:#34A853; border-color:#34A853; color:#ffffff; font-size:11.5px; padding:4px 10px; font-weight:700;" title="Run Vertex AI 6R Target Recommender Agent">
         &#129302; Run 6R AI
       </button>
-      <button id="btn-export-md" class="btn btn-secondary" style="font-size:12px; padding:5px 10px; border-color:#a8dab5; background:#e6f4ea; color:#137333;" title="Export Markdown Assessment Report">
+      <button id="btn-export-md" class="btn" style="font-size:11.5px; padding:4px 10px; background:rgba(255,255,255,0.15); color:#ffffff; border:1px solid rgba(255,255,255,0.35);" title="Export Markdown Assessment Report">
         Export Report
       </button>
-      <button id="btn-export-tf" class="btn btn-secondary" style="font-size:12px; padding:5px 10px; border-color:#fde293; background:#fef7e0; color:#b06000;" title="Export Google Cloud Foundation Fabric Terraform">
+      <button id="btn-export-tf" class="btn" style="font-size:11.5px; padding:4px 10px; background:#FBBC05; color:#0f172a; border:1px solid #FBBC05; font-weight:700;" title="Export Google Cloud Foundation Fabric Terraform">
         Export Terraform
       </button>
       <button id="btn-ingest-data" style="display:none;" aria-hidden="true"></button>
       <button id="btn-add-workload" style="display:none;" aria-hidden="true"></button>
 
-      <!-- Compact Background Toggle moved to the far Top Right -->
-      <div class="bg-customizer-group" style="display:inline-flex; align-items:center; gap:2px; padding:2px; background:var(--bg-elevated); border:1px solid var(--border-subtle); border-radius:6px; margin-left:4px;" title="Switch Theme (White / Black)">
-        <button type="button" class="bg-swatch-btn active" data-bgcolor="#ffffff" style="width:auto; height:auto; border-radius:4px; padding:2px 6px; font-size:10.5px; font-weight:600; background:#ffffff; color:#0f172a; border:1px solid #cbd5e1; cursor:pointer;" title="Light Google Theme">&#9728;&#65039;</button>
-        <button type="button" class="bg-swatch-btn" data-bgcolor="#000000" style="width:auto; height:auto; border-radius:4px; padding:2px 6px; font-size:10.5px; font-weight:600; background:#000000; color:#f8fafc; border:1px solid #334155; cursor:pointer;" title="Dark Theme">&#127769;</button>
+      <!-- Compact Background Toggle at Far Top Right -->
+      <div class="bg-customizer-group" style="display:inline-flex; align-items:center; gap:2px; padding:2px; background:rgba(255,255,255,0.18); border:1px solid rgba(255,255,255,0.35); border-radius:6px; margin-left:4px;" title="Switch Theme (Light / Dark)">
+        <button type="button" class="bg-swatch-btn active" data-bgcolor="#ffffff" style="width:auto; height:auto; border-radius:4px; padding:2px 6px; font-size:10.5px; font-weight:600; background:#ffffff; color:#0f172a; border:none; cursor:pointer;" title="Google Color Light Theme">&#9728;&#65039;</button>
+        <button type="button" class="bg-swatch-btn" data-bgcolor="#000000" style="width:auto; height:auto; border-radius:4px; padding:2px 6px; font-size:10.5px; font-weight:600; background:#0f172a; color:#f8fafc; border:none; cursor:pointer;" title="Dark Theme">&#127769;</button>
       </div>
     </div>
   </header>
 
   <main class="main-container" id="main-workspace-container">
     <!-- Single-Row Google Color-Coded Navigation Bar: All 6 Tabs + Single-Page View Toggle -->
-    <nav class="studio-tabs" role="tablist" style="display:grid; grid-template-columns:repeat(7, minmax(0, 1fr)); gap:6px; overflow:visible; background:#ffffff; padding:6px 8px; border-radius:10px; border:1px solid #d2e3fc; box-shadow:0 2px 8px rgba(66,133,244,0.08);">
-      <button class="tab-btn active" data-tab="tab-upload" role="tab" aria-selected="true" style="border-top:3px solid #4285F4; border-radius:6px;">
+    <nav class="studio-tabs" role="tablist">
+      <button class="tab-btn active" data-tab="tab-upload" role="tab" aria-selected="true" style="border-top:3px solid #4285F4;">
         <span style="color:#4285F4;">&#9679;</span> 1. Upload File
       </button>
-      <button class="tab-btn" data-tab="tab-overview" role="tab" aria-selected="false" style="border-top:3px solid #EA4335; border-radius:6px;">
+      <button class="tab-btn" data-tab="tab-overview" role="tab" aria-selected="false" style="border-top:3px solid #EA4335;">
         <span style="color:#EA4335;">&#9679;</span> 2. Estate Overview
       </button>
-      <button class="tab-btn" data-tab="tab-domains" role="tab" aria-selected="false" style="border-top:3px solid #FBBC05; border-radius:6px;">
+      <button class="tab-btn" data-tab="tab-domains" role="tab" aria-selected="false" style="border-top:3px solid #FBBC05;">
         <span style="color:#FBBC05;">&#9679;</span> 3. 6R &amp; AI Matrix
       </button>
-      <button class="tab-btn" data-tab="tab-databases" role="tab" aria-selected="false" style="border-top:3px solid #34A853; border-radius:6px;">
+      <button class="tab-btn" data-tab="tab-databases" role="tab" aria-selected="false" style="border-top:3px solid #34A853;">
         <span style="color:#34A853;">&#9679;</span> 4. DB &amp; Network
       </button>
-      <button class="tab-btn" data-tab="tab-scenarios" role="tab" aria-selected="false" style="border-top:3px solid #4285F4; border-radius:6px;">
+      <button class="tab-btn" data-tab="tab-scenarios" role="tab" aria-selected="false" style="border-top:3px solid #4285F4;">
         <span style="color:#4285F4;">&#9679;</span> 5. Financial TCO
       </button>
-      <button class="tab-btn" data-tab="tab-waves-waf" role="tab" aria-selected="false" style="border-top:3px solid #34A853; border-radius:6px;">
+      <button class="tab-btn" data-tab="tab-waves-waf" role="tab" aria-selected="false" style="border-top:3px solid #34A853;">
         <span style="color:#34A853;">&#9679;</span> 6. Waves &amp; WAF
       </button>
-      <button type="button" id="btn-toggle-single-page" class="tab-btn" style="background:#e8f0fe; color:#1967d2; border-top:3px solid #1a73e8; border-radius:6px; font-weight:700;" title="Show all tabs stacked on a single scrollable page">
+      <button type="button" id="btn-toggle-single-page" class="tab-btn" style="background:#e8f0fe; color:#1967d2; border-top:3px solid #1a73e8; font-weight:700;" title="Show all tabs stacked on a single scrollable page">
         &#128196; All on 1 Page
       </button>
     </nav>
@@ -85,91 +81,91 @@
     <!-- TAB 1 (MAIN PAGE): Colorful Google-Branded Minimal File Upload Card     -->
     <!-- ======================================================================= -->
     <section id="tab-upload" class="tab-panel active" role="tabpanel">
-      <div style="max-width: 680px; margin: 1.5rem auto;">
-        <div class="card-panel" style="padding: 0; border: 1px solid #d2e3fc; border-radius: 16px; overflow: hidden; box-shadow: 0 12px 32px rgba(66,133,244,0.10);">
+      <div style="max-width: 680px; margin: 1rem auto;">
+        <div class="card-panel" style="padding: 0; border: 1px solid #aecbfa; border-radius: 16px; overflow: hidden; box-shadow: 0 12px 32px rgba(66,133,244,0.12);">
           <!-- 4-Color Google Card Header Stripe -->
           <div style="height: 6px; background: linear-gradient(90deg, #4285F4 0% 25%, #EA4335 25% 50%, #FBBC05 50% 75%, #34A853 75% 100%);"></div>
 
-          <div style="padding: 2rem 2.25rem;">
-            <div style="text-align: center; margin-bottom: 1.35rem;">
+          <div style="padding: 1.85rem 2.15rem;">
+            <div style="text-align: center; margin-bottom: 1.25rem;">
               <!-- 4-Color Google Feature Pills -->
               <div style="display:flex; justify-content:center; gap:0.45rem; flex-wrap:wrap; margin-bottom:0.85rem;">
-                <span style="background:#e8f0fe; color:#1967d2; border:1px solid #aecbfa; font-size:0.72rem; font-weight:700; padding:3px 10px; border-radius:999px;">&#128309; Gemini 3.8 AI</span>
-                <span style="background:#fce8e6; color:#c5221f; border:1px solid #f6aea9; font-size:0.72rem; font-weight:700; padding:3px 10px; border-radius:999px;">&#128308; 6R Target Mapping</span>
-                <span style="background:#fef7e0; color:#b06000; border:1px solid #fde293; font-size:0.72rem; font-weight:700; padding:3px 10px; border-radius:999px;">&#128993; Gen4 Right-Sizing</span>
-                <span style="background:#e6f4ea; color:#137333; border:1px solid #a8dab5; font-size:0.72rem; font-weight:700; padding:3px 10px; border-radius:999px;">&#128994; FinOps TCO Savings</span>
+                <span class="badge-6r badge-blue">&#128309; Gemini 3.8 AI</span>
+                <span class="badge-6r badge-rose">&#128308; 6R Target Mapping</span>
+                <span class="badge-6r badge-amber">&#128993; Gen4 Right-Sizing</span>
+                <span class="badge-6r badge-emerald">&#128994; FinOps TCO Savings</span>
               </div>
 
-              <h1 style="font-size: 1.45rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.4rem 0;">
+              <h1 style="font-size: 1.4rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.35rem 0;">
                 Upload Infrastructure Discovery File
               </h1>
-              <p style="font-size: 0.88rem; color: var(--text-secondary); margin: 0;">
+              <p style="font-size: 0.86rem; color: var(--text-secondary); margin: 0;">
                 Upload a VMware RVTools (<code>vInfo</code>), Migration Center, or Server Inventory <code>.csv</code> file to generate your 6R Target Architecture &amp; TCO Assessment.
               </p>
             </div>
 
             <!-- Tinted Google Blue/Green Dropzone -->
-            <div id="page1-dropzone" style="border: 2px dashed #4285F4; border-radius: 12px; padding: 1.65rem 1.25rem; text-align: center; background: linear-gradient(135deg, rgba(66,133,244,0.07) 0%, rgba(52,168,83,0.05) 100%); margin-bottom: 1.25rem; cursor: pointer;">
-              <div style="font-size: 0.96rem; font-weight: 700; color: #1967d2; margin-bottom: 0.3rem;">
+            <div id="page1-dropzone" style="border: 2px dashed #4285F4; border-radius: 12px; padding: 1.5rem 1.25rem; text-align: center; background: linear-gradient(135deg, rgba(66,133,244,0.08) 0%, rgba(52,168,83,0.06) 100%); margin-bottom: 1.15rem; cursor: pointer;">
+              <div style="font-size: 0.95rem; font-weight: 700; color: #1967d2; margin-bottom: 0.25rem;">
                 Select a <code>.CSV</code> or <code>.TXT</code> Discovery File
               </div>
-              <div id="page1-file-status" style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.9rem;">
+              <div id="page1-file-status" style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.85rem;">
                 Supports VMware RVTools, mFit, DrMigrate, or standard server inventory exports.
               </div>
               <div style="display:flex; justify-content:center; gap:0.6rem; flex-wrap:wrap;">
-                <label class="btn btn-primary" style="cursor: pointer; background:#4285F4; border-color:#4285F4; padding: 0.52rem 1.15rem; font-size: 0.84rem; box-shadow:0 2px 6px rgba(66,133,244,0.25);">
+                <label class="btn btn-primary" style="cursor: pointer; background:#4285F4; border-color:#4285F4; padding: 0.5rem 1.1rem; font-size: 0.84rem;">
                   &#128194; Browse .CSV File
                   <input type="file" id="page1-file-input" accept=".csv,.txt" style="display: none;">
                 </label>
-                <button type="button" id="page1-btn-load-sample" class="btn btn-secondary" style="font-size: 0.84rem; padding: 0.52rem 1rem; background:#e6f4ea; color:#137333; border-color:#a8dab5; font-weight:600;">
+                <button type="button" id="page1-btn-load-sample" class="btn" style="font-size: 0.84rem; padding: 0.5rem 1rem; background:#e6f4ea; color:#137333; border-color:#a8dab5; font-weight:600;">
                   &#9889; Load 50-Server Sample
                 </button>
-                <button type="button" id="page1-btn-download-template" class="btn btn-secondary" style="font-size: 0.84rem; padding: 0.52rem 0.95rem; background:#fef7e0; color:#b06000; border-color:#fde293; font-weight:600;">
+                <button type="button" id="page1-btn-download-template" class="btn" style="font-size: 0.84rem; padding: 0.5rem 0.95rem; background:#fef7e0; color:#b06000; border-color:#fde293; font-weight:600;">
                   &#11015; Template (.csv)
                 </button>
               </div>
             </div>
 
-          <!-- Compact 3-Column Assessment Scope -->
-          <div class="form-row" style="margin-bottom: 1rem; gap: 0.75rem;">
-            <div class="form-field">
-              <label for="page1-client-name" style="font-size:0.76rem;">Customer Name</label>
-              <input type="text" id="page1-client-name" value="Enterprise Client Assessment" class="form-input" style="padding:6px 10px; font-size:0.84rem;">
-            </div>
-            <div class="form-field">
-              <label for="page1-industry" style="font-size:0.76rem;">Industry</label>
-              <input type="text" id="page1-industry" value="Enterprise &amp; Public Sector" class="form-input" style="padding:6px 10px; font-size:0.84rem;">
-            </div>
-            <div class="form-field">
-              <label for="page1-region" style="font-size:0.76rem;">Target GCP Region</label>
-              <select id="page1-region" class="select-input" style="padding:6px 10px; font-size:0.84rem;">
-                <option value="me-central1 (Doha, Qatar)" selected>me-central1 (Doha)</option>
-                <option value="europe-west1 (Belgium)">europe-west1 (Belgium)</option>
-                <option value="europe-west3 (Frankfurt, Germany)">europe-west3 (Frankfurt)</option>
-                <option value="europe-west2 (London, UK)">europe-west2 (London)</option>
-                <option value="us-central1 (Iowa, USA)">us-central1 (Iowa)</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Optional Collapsible Preview so main page stays ultra-minimal -->
-          <details style="margin-bottom: 1.25rem; font-size: 0.78rem; color: var(--text-secondary);">
-            <summary style="cursor: pointer; font-weight: 600; padding: 0.3rem 0;">
-              Optional: View / Edit Raw CSV Telemetry &amp; Required Columns
-            </summary>
-            <div style="margin-top: 0.5rem;">
-              <div style="font-size: 0.74rem; color: var(--text-muted); margin-bottom: 0.35rem;">
-                Columns: <code>VM_Name, Application, OS_Version, vCPU, Memory_GB, Storage_TB, CPU_P95_Pct, Environment, Database_Engine, Software_Stack, Annual_Cost_USD</code>
+            <!-- Compact 3-Column Assessment Scope -->
+            <div class="form-row" style="margin-bottom: 0.95rem; gap: 0.75rem;">
+              <div class="form-field">
+                <label for="page1-client-name" style="font-size:0.76rem;">Customer Name</label>
+                <input type="text" id="page1-client-name" value="Enterprise Client Assessment" class="form-input" style="padding:6px 10px; font-size:0.84rem;">
               </div>
-              <textarea id="page1-csv-text" rows="5" class="code-preview" style="width:100%; font-family:var(--font-mono); font-size:0.74rem; resize:vertical;"></textarea>
+              <div class="form-field">
+                <label for="page1-industry" style="font-size:0.76rem;">Industry</label>
+                <input type="text" id="page1-industry" value="Enterprise &amp; Public Sector" class="form-input" style="padding:6px 10px; font-size:0.84rem;">
+              </div>
+              <div class="form-field">
+                <label for="page1-region" style="font-size:0.76rem;">Target GCP Region</label>
+                <select id="page1-region" class="select-input" style="padding:6px 10px; font-size:0.84rem;">
+                  <option value="me-central1 (Doha, Qatar)" selected>me-central1 (Doha)</option>
+                  <option value="europe-west1 (Belgium)">europe-west1 (Belgium)</option>
+                  <option value="europe-west3 (Frankfurt, Germany)">europe-west3 (Frankfurt)</option>
+                  <option value="europe-west2 (London, UK)">europe-west2 (London)</option>
+                  <option value="us-central1 (Iowa, USA)">us-central1 (Iowa)</option>
+                </select>
+              </div>
             </div>
-          </details>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; padding-top: 0.5rem; border-top: 1px solid var(--border-subtle);">
+            <!-- Optional Collapsible Preview -->
+            <details style="margin-bottom: 1.15rem; font-size: 0.78rem; color: var(--text-secondary);">
+              <summary style="cursor: pointer; font-weight: 600; padding: 0.3rem 0;">
+                Optional: View / Edit Raw CSV Telemetry &amp; Required Columns
+              </summary>
+              <div style="margin-top: 0.5rem;">
+                <div style="font-size: 0.74rem; color: var(--text-muted); margin-bottom: 0.35rem;">
+                  Columns: <code>VM_Name, Application, OS_Version, vCPU, Memory_GB, Storage_TB, CPU_P95_Pct, Environment, Database_Engine, Software_Stack, Annual_Cost_USD</code>
+                </div>
+                <textarea id="page1-csv-text" rows="5" class="code-preview" style="width:100%; font-family:var(--font-mono); font-size:0.74rem; resize:vertical;"></textarea>
+              </div>
+            </details>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; padding-top: 0.65rem; border-top: 1px solid var(--border-subtle);">
               <button type="button" id="page1-btn-skip-to-tab2" class="btn btn-secondary" style="font-size: 0.82rem;">
                 Skip to Reference Estate &rarr;
               </button>
-              <button type="button" id="page1-btn-submit-upload" class="btn btn-primary" style="background:#1a73e8; border-color:#1a73e8; padding: 0.6rem 1.4rem; font-size: 0.88rem; font-weight: 600;">
+              <button type="button" id="page1-btn-submit-upload" class="btn btn-primary" style="background:#1a73e8; border-color:#1a73e8; padding: 0.55rem 1.35rem; font-size: 0.86rem; font-weight: 600;">
                 Analyze &amp; Generate 6R Assessment &rarr;
               </button>
             </div>
@@ -179,36 +175,27 @@
     </section>
 
     <!-- ======================================================================= -->
-    <!-- TAB 2: Customer Name Banner, KPIs & Estate Overview (Slide 3 & 7-9)     -->
+    <!-- TAB 2: Estate Overview (Google 4-Color Template, No Big White Banner)   -->
     <!-- ======================================================================= -->
     <section id="tab-overview" class="tab-panel" role="tabpanel">
-      <!-- Relocated Customer Selector & Customer Name Banner (Moved from Page 1 to Tab 2) -->
-      <div class="card-panel" style="margin-bottom: 1rem; padding: 0.85rem 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
-        <div class="selector-group" style="display: flex; align-items: center; gap: 0.65rem;">
-          <label for="estate-select" class="selector-label" style="font-weight: 700; color: var(--text-primary);">Active Customer Estate:</label>
-          <select id="estate-select" class="select-input">
+      <!-- Compact Google-Colored Customer Selector Strip (Replaces Big White Banner) -->
+      <div class="google-tab-banner">
+        <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+          <span class="badge-6r badge-blue">&#127970; Active Estate</span>
+          <select id="estate-select" class="select-input" style="font-weight:700; min-width:310px;">
             <option value="enterprise-reference-estate">Enterprise Reference Estate (538 Servers / 110 Applications)</option>
             <option value="cymbal-retail-hybrid">Cymbal Global Retail &amp; E-Commerce (48 Servers / VMware + AWS)</option>
           </select>
+          <span id="estate-name" style="font-weight:700; color:var(--text-primary); font-size:0.92rem;">Customer Estate Overview</span>
         </div>
-        <span class="meta-chip" style="color: var(--accent-blue);">Customer Profile &amp; Assessment Scope (Tab 2)</span>
+        <div style="display:flex; align-items:center; gap:0.45rem; flex-wrap:wrap;">
+          <span class="badge-6r badge-emerald" id="estate-region">Target Region: me-central1 (Doha)</span>
+          <span class="badge-6r badge-amber" id="estate-env">VMware vSphere / GCVE</span>
+          <span class="badge-6r badge-rose" id="estate-compliance">ISO 27001</span>
+          <span id="estate-date" style="display:none;"></span>
+          <span id="estate-desc" style="display:none;"></span>
+        </div>
       </div>
-
-      <!-- Executive Customer Summary Banner (Now on Tab 2) -->
-      <section class="estate-banner" id="estate-banner" style="margin-bottom: 1.25rem;">
-        <div class="estate-banner-left">
-          <div style="display:flex; align-items:center; gap:0.65rem;">
-            <h1 id="estate-name" class="estate-title">Customer Estate Overview</h1>
-            <span id="estate-date" class="meta-chip" style="color:#06b6d4; border-color:rgba(6,182,212,0.3);">Prepared: August 05, 2026</span>
-          </div>
-          <p id="estate-desc" class="estate-description">Loading Rapid Insights telemetry...</p>
-        </div>
-        <div class="estate-meta-tags">
-          <span class="meta-chip" id="estate-env">Environment: VMware vSphere / GCVE Hybrid</span>
-          <span class="meta-chip" id="estate-region">Target Region: me-central1 (Doha)</span>
-          <span class="meta-chip" id="estate-compliance">Compliance: Qatar NIA, ISO 27001</span>
-        </div>
-      </section>
 
       <!-- 4 Executive KPI Cards (Now on Tab 2) -->
       <section class="kpi-grid" aria-label="Executive Assessment Metrics" style="margin-bottom: 1.5rem;">
