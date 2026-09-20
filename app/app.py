@@ -1726,7 +1726,7 @@ def run_vertex_6r_migration_agent(
                             "text": (
                                 f"Analyze these {len(workload_input_list)} workloads for estate '{base_estate.get('name')}' "
                                 f"(Target Region: {base_estate.get('default_region')}) and produce optimal 6R target recommendations:\n"
-                                + _json.dumps(workload_input_list)
+                                + json.dumps(workload_input_list)
                             )
                         }
                     ],
@@ -1743,7 +1743,7 @@ def run_vertex_6r_migration_agent(
         try:
             req = urllib.request.Request(
                 url,
-                data=_json.dumps(payload).encode("utf-8"),
+                data=json.dumps(payload).encode("utf-8"),
                 headers={
                     "Authorization": f"Bearer {token}",
                     "Content-Type": "application/json",
@@ -1751,14 +1751,14 @@ def run_vertex_6r_migration_agent(
                 method="POST",
             )
             with urllib.request.urlopen(req, timeout=28.0) as resp:
-                body = _json.loads(resp.read().decode("utf-8"))
+                body = json.loads(resp.read().decode("utf-8"))
                 candidates = body.get("candidates", [])
                 if candidates:
                     parts = candidates[0].get("content", {}).get("parts", [])
                     json_text = "".join(p.get("text", "") for p in parts if not p.get("thought")).strip()
                     if not json_text:
                         json_text = "".join(p.get("text", "") for p in parts).strip()
-                    parsed = _json.loads(json_text)
+                    parsed = json.loads(json_text)
                     if isinstance(parsed, dict) and parsed.get("recommendations"):
                         ai_recommendations = parsed["recommendations"]
                         executive_summary = parsed.get("executive_6r_summary", "")
