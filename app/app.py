@@ -1965,19 +1965,22 @@ def auth_google_login() -> Any:
     email = (request.form.get("email") or "").strip().lower()
     if not email.endswith(("@google.com", "@imedtra.altostrat.com", "@altostrat.com")):
         return (
-            f"""<!DOCTYPE html><html><head><meta charset="utf-8"><title>403 Googler Access Only</title>
-            <style>body{{background:#060911;color:#f8fafc;font-family:'Inter',system-ui,sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;}}
-            .card{{background:#0f172a;border:1px solid #ef4444;border-radius:14px;padding:2.2rem;max-width:460px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.6);}}
-            a.btn{{display:inline-block;margin-top:1.2rem;padding:0.65rem 1.3rem;background:#2563eb;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;}}</style></head>
-            <body><div class="card"><h2 style="color:#f87171;margin-top:0;">🚫 403 Access Denied — Googlers Only</h2>
-            <p style="color:#cbd5e1;font-size:0.92rem;line-height:1.5;">The account <strong>{email or 'provided'}</strong> is not an authorized <code>@google.com</code> corporate identity.</p>
-            <p style="color:#94a3b8;font-size:0.84rem;">Only <strong>@google.com</strong> Googlers are permitted to access SPARK Architecture Modernization Studio.</p>
-            <a class="btn" href="/">Try Again with @google.com</a></div></body></html>""",
+            f"""<!DOCTYPE html><html><head><meta charset="utf-8"><title>Access Restricted — Google Corporate Sign-In</title>
+            <style>
+              body {{ background: #f8f9fa; color: #202124; font-family: 'Google Sans', 'Roboto', Arial, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }}
+              .g-card {{ background: #ffffff; border: 1px solid #dadce0; border-radius: 8px; padding: 44px 40px 36px; width: 100%; max-width: 420px; text-align: center; box-sizing: border-box; }}
+              .g-btn {{ display: inline-block; margin-top: 24px; padding: 10px 24px; background: #1a73e8; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: 500; font-size: 14px; }}
+              .g-btn:hover {{ background: #1557b0; }}
+            </style></head>
+            <body><div class="g-card">
+              <svg width="40" height="40" viewBox="0 0 48 48" style="margin-bottom:16px;"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+              <h2 style="font-size:22px;font-weight:400;margin:0 0 10px 0;color:#202124;">Googler Account Required</h2>
+              <p style="color:#5f6368;font-size:14px;line-height:1.5;margin:0;">The account <strong>{email or 'provided'}</strong> is not an authorized <code>@google.com</code> corporate address.</p>
+              <a class="g-btn" href="/">Sign in with @google.com</a>
+            </div></body></html>""",
             403,
         )
-    resp = app.make_response(
-        '<script>window.location.replace("/");</script>'
-    )
+    resp = app.make_response('<script>window.location.replace("/");</script>')
     resp.set_cookie(
         "spark_googler_session",
         _sign_googler_email(email),
@@ -1997,10 +2000,9 @@ def auth_logout() -> Any:
 
 @app.before_request
 def verify_iap_googler_identity() -> Any:
-    """Enforces @google.com Googler-only access on the Load Balancer without cross-domain IAP Error Code 9."""
+    """Enforces @google.com Googler-only access using a clean white Google Sign-In template."""
     if request.path in ("/healthz", "/auth/google-login", "/auth/logout") or request.path.startswith("/api/"):
         return None
-    # Enforce gatekeeper on external Load Balancer / Cloud Run requests (skip localhost preview if needed)
     host = request.headers.get("Host", "")
     if "localhost" in host or "127.0.0.1" in host or "googlers.com" in host:
         return None
@@ -2012,29 +2014,48 @@ def verify_iap_googler_identity() -> Any:
 
     return (
         """<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-        <title>Google Corporate Sign-In — SPARK Architecture Modernization Studio</title>
+        <title>Sign in — Google Accounts</title>
         <style>
-          body { background: radial-gradient(circle at top, #0f172a 0%, #020617 100%); color: #f8fafc; font-family: 'Inter', -apple-system, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-          .login-card { background: rgba(15, 23, 42, 0.92); border: 1px solid rgba(56, 189, 248, 0.35); border-radius: 16px; padding: 2.4rem; width: 100%; max-width: 430px; box-shadow: 0 25px 60px rgba(0,0,0,0.65); text-align: center; }
-          .badge { display: inline-block; background: rgba(2, 132, 199, 0.2); border: 1px solid #38bdf8; color: #38bdf8; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 0.25rem 0.75rem; border-radius: 999px; margin-bottom: 1rem; }
-          h1 { font-size: 1.25rem; margin: 0 0 0.4rem 0; color: #ffffff; }
-          p { font-size: 0.86rem; color: #94a3b8; line-height: 1.5; margin-bottom: 1.4rem; }
-          input[type="email"] { width: 100%; box-sizing: border-box; padding: 0.75rem 0.9rem; border-radius: 8px; border: 1px solid #334155; background: #020617; color: #f8fafc; font-size: 0.92rem; margin-bottom: 1rem; outline: none; }
-          input[type="email"]:focus { border-color: #38bdf8; }
-          button { width: 100%; padding: 0.8rem; border-radius: 8px; border: none; background: linear-gradient(135deg, #0284c7, #2563eb); color: #fff; font-weight: 700; font-size: 0.92rem; cursor: pointer; }
-          button:hover { opacity: 0.95; }
-          .sec-meta { margin-top: 1.3rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.08); font-size: 0.74rem; color: #64748b; }
+          body { background: #f8f9fa; color: #202124; font-family: 'Google Sans', 'Roboto', -apple-system, BlinkMacSystemFont, Arial, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+          .g-login-card { background: #ffffff; border: 1px solid #dadce0; border-radius: 8px; padding: 48px 40px 36px; width: 100%; max-width: 448px; box-sizing: border-box; text-align: center; }
+          .g-title { font-size: 24px; font-weight: 400; color: #202124; margin: 16px 0 8px 0; }
+          .g-subtitle { font-size: 16px; font-weight: 400; color: #202124; margin: 0 0 28px 0; }
+          .g-field-wrap { text-align: left; margin-bottom: 24px; }
+          .g-label { display: block; font-size: 12px; font-weight: 500; color: #1a73e8; margin-bottom: 6px; }
+          .g-input { width: 100%; box-sizing: border-box; padding: 13px 15px; border-radius: 4px; border: 1px solid #dadce0; background: #ffffff; color: #202124; font-size: 16px; outline: none; transition: border-color 0.15s; }
+          .g-input:focus { border: 2px solid #1a73e8; padding: 12px 14px; }
+          .g-hint { font-size: 12px; color: #5f6368; margin-top: 8px; line-height: 1.4; }
+          .g-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 32px; }
+          .g-badge { font-size: 12px; color: #5f6368; display: flex; align-items: center; gap: 5px; }
+          .g-submit { padding: 10px 24px; border-radius: 4px; border: none; background: #1a73e8; color: #ffffff; font-weight: 500; font-size: 14px; cursor: pointer; letter-spacing: 0.25px; }
+          .g-submit:hover { background: #1557b0; box-shadow: 0 1px 2px rgba(60,64,67,0.3); }
+          .g-footer { max-width: 448px; width: 100%; display: flex; justify-content: space-between; font-size: 12px; color: #5f6368; margin-top: 16px; padding: 0 4px; box-sizing: border-box; }
         </style></head>
         <body>
-          <div class="login-card">
-            <div class="badge">🛡️ Google Cloud Armor WAF + TLS 1.2+ Protected</div>
-            <h1>SPARK Architecture Modernization Studio</h1>
-            <p>Access to this application is restricted exclusively to <strong>@google.com</strong> Googlers.<br>Verify your corporate Google identity to continue:</p>
+          <div class="g-login-card">
+            <svg width="48" height="48" viewBox="0 0 48 48" aria-hidden="true">
+              <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+              <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+              <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+              <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+            </svg>
+            <h1 class="g-title">Sign in</h1>
+            <p class="g-subtitle">to continue to <strong>SPARK Architecture Studio</strong></p>
             <form method="POST" action="/auth/google-login">
-              <input type="email" name="email" value="imedtra@google.com" placeholder="username@google.com" required autofocus>
-              <button type="submit">🔐 Continue as Googler (@google.com)</button>
+              <div class="g-field-wrap">
+                <label class="g-label" for="g-email">Google Corporate Email (@google.com)</label>
+                <input class="g-input" id="g-email" type="email" name="email" value="imedtra@google.com" placeholder="username@google.com" required autofocus>
+                <div class="g-hint">Protected by Google Cloud Armor WAF &bull; Restricted to <strong>@google.com</strong> Googlers</div>
+              </div>
+              <div class="g-actions">
+                <span class="g-badge">🔒 TLS 1.2+ &bull; Gemini 3.8</span>
+                <button type="submit" class="g-submit">Next</button>
+              </div>
             </form>
-            <div class="sec-meta">Protected by External HTTPS Load Balancer • Cloud Armor WAF • Vertex AI Gemini 3.8</div>
+          </div>
+          <div class="g-footer">
+            <span>Google Cloud EMEA OCE</span>
+            <span>Privacy &bull; Terms &bull; Internal Only</span>
           </div>
         </body></html>""",
         200,

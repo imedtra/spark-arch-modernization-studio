@@ -54,9 +54,26 @@ function initEventListeners() {
     fetchAssessment();
   });
 
-  // Tab navigation
+  // Tab navigation & Single-Page View toggle
+  const mainWorkspace = document.getElementById('main-workspace-container');
   document.querySelectorAll('.tab-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
+      if (btn.id === 'btn-toggle-single-page') {
+        if (mainWorkspace) {
+          const isSingle = mainWorkspace.classList.toggle('single-page-mode');
+          btn.classList.toggle('active', isSingle);
+          btn.innerHTML = isSingle ? '&#9989; 1-Page Active' : '&#128196; All on 1 Page';
+        }
+        return;
+      }
+      if (mainWorkspace) {
+        mainWorkspace.classList.remove('single-page-mode');
+      }
+      const spBtn = document.getElementById('btn-toggle-single-page');
+      if (spBtn) {
+        spBtn.classList.remove('active');
+        spBtn.innerHTML = '&#128196; All on 1 Page';
+      }
       document.querySelectorAll('.tab-btn').forEach((b) => {
         b.classList.remove('active');
         b.setAttribute('aria-selected', 'false');
@@ -65,7 +82,8 @@ function initEventListeners() {
       btn.classList.add('active');
       btn.setAttribute('aria-selected', 'true');
       const targetId = btn.getAttribute('data-tab');
-      document.getElementById(targetId).classList.add('active');
+      const targetEl = document.getElementById(targetId);
+      if (targetEl) targetEl.classList.add('active');
     });
   });
 

@@ -325,12 +325,13 @@ body {
 
 .nav-tabs,
 .studio-tabs {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   border-bottom: 2px solid var(--border-subtle);
   margin-bottom: 20px;
-  overflow-x: auto;
+  overflow: visible;
 }
 
 .tab-btn {
@@ -339,11 +340,14 @@ body {
   border-bottom: 3px solid transparent;
   color: var(--text-secondary);
   font-family: var(--font-sans);
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 600;
-  padding: 10px 15px;
+  padding: 10px 6px;
+  text-align: center;
   cursor: pointer;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   transition: all 0.15s ease;
 }
 
@@ -362,8 +366,15 @@ body {
   display: none;
 }
 
-.tab-panel.active {
+.tab-panel.active,
+.main-container.single-page-mode .tab-panel {
   display: block;
+}
+
+.main-container.single-page-mode .tab-panel {
+  margin-bottom: 2.5rem;
+  padding-bottom: 2rem;
+  border-bottom: 2px dashed var(--border-subtle);
 }
 
 /* Slide 3: 4-Column Rapid Insights Estate Overview Grid */

@@ -29,149 +29,132 @@
       </div>
     </div>
 
-    <div class="header-controls">
-      <!-- White / Black Background Toggle -->
-      <div class="bg-customizer-group" title="Switch Website Background Between White and Black">
-        <span class="bg-customizer-label">&#127912; Background:</span>
-        <button type="button" class="bg-swatch-btn active" data-bgcolor="#ffffff" style="width:auto; height:auto; border-radius:4px; padding:3px 9px; font-size:11.5px; font-weight:600; background:#ffffff; color:#0f172a; border:1px solid #cbd5e1;" title="White Background (Default)">&#9728;&#65039; White</button>
-        <button type="button" class="bg-swatch-btn" data-bgcolor="#000000" style="width:auto; height:auto; border-radius:4px; padding:3px 9px; font-size:11.5px; font-weight:600; background:#000000; color:#f8fafc; border:1px solid #334155;" title="Black Background">&#127769; Black</button>
-      </div>
+    <div class="header-controls" style="display:flex; align-items:center; gap:0.45rem;">
+      <button id="btn-header-ai-6r" class="btn btn-primary" style="background:#1a73e8; border-color:#1a73e8; font-size:12px; padding:5px 10px;" title="Run Vertex AI 6R Target Recommender Agent">
+        &#129302; Run 6R AI
+      </button>
+      <button id="btn-export-md" class="btn btn-secondary" style="font-size:12px; padding:5px 10px;" title="Export Markdown Assessment Report">
+        Export Report
+      </button>
+      <button id="btn-export-tf" class="btn btn-secondary" style="font-size:12px; padding:5px 10px;" title="Export Google Cloud Foundation Fabric Terraform">
+        Export Terraform
+      </button>
+      <!-- Hidden utility triggers kept for JS compatibility -->
+      <button id="btn-ingest-data" style="display:none;" aria-hidden="true"></button>
+      <button id="btn-add-workload" style="display:none;" aria-hidden="true"></button>
 
-      <button id="btn-header-ai-6r" class="btn btn-primary" style="background:linear-gradient(135deg,#0284c7,#2563eb);" title="Run Vertex AI 6R Target Recommender Agent across all workloads">
-        &#129302; Run AI 6R Agent
-      </button>
-      <button id="btn-ingest-data" class="btn btn-secondary" title="Open Discovery File Upload Modal">
-        &#128229; Quick Upload Modal
-      </button>
-      <button id="btn-add-workload" class="btn btn-secondary" title="Add custom discovered server/application">
-        + Add Workload
-      </button>
-      <button id="btn-export-md" class="btn btn-secondary" title="Export 44-Slide Rapid Insights Executive Report">
-        Export Rapid Insights MD
-      </button>
-      <button id="btn-export-tf" class="btn btn-primary" title="Export Google Cloud FastFabric Terraform IaC">
-        Export Terraform HCL
-      </button>
+      <!-- Compact Background Toggle moved to the far Top Right -->
+      <div class="bg-customizer-group" style="display:inline-flex; align-items:center; gap:2px; padding:2px; background:var(--bg-elevated); border:1px solid var(--border-subtle); border-radius:6px; margin-left:4px;" title="Switch Theme (White / Black)">
+        <button type="button" class="bg-swatch-btn active" data-bgcolor="#ffffff" style="width:auto; height:auto; border-radius:4px; padding:2px 6px; font-size:10.5px; font-weight:600; background:#ffffff; color:#0f172a; border:1px solid #cbd5e1; cursor:pointer;" title="White Theme">&#9728;&#65039;</button>
+        <button type="button" class="bg-swatch-btn" data-bgcolor="#000000" style="width:auto; height:auto; border-radius:4px; padding:2px 6px; font-size:10.5px; font-weight:600; background:#000000; color:#f8fafc; border:1px solid #334155; cursor:pointer;" title="Black Theme">&#127769;</button>
+      </div>
     </div>
   </header>
 
-  <main class="main-container">
-    <!-- Interactive Navigation Tabs (Tab 1 = File Upload Landing Page; Tab 2 = Customer Name & Estate Overview) -->
-    <nav class="studio-tabs" role="tablist">
+  <main class="main-container" id="main-workspace-container">
+    <!-- Single-Row Navigation Bar: All 6 Tabs + Single-Page View Toggle Visible Together -->
+    <nav class="studio-tabs" role="tablist" style="display:grid; grid-template-columns:repeat(7, minmax(0, 1fr)); gap:4px; overflow:visible;">
       <button class="tab-btn active" data-tab="tab-upload" role="tab" aria-selected="true">
-        1. Load Discovery File (Start Here)
+        1. Upload File
       </button>
       <button class="tab-btn" data-tab="tab-overview" role="tab" aria-selected="false">
-        2. Customer Estate &amp; Infrastructure Overview
+        2. Estate Overview
       </button>
       <button class="tab-btn" data-tab="tab-domains" role="tab" aria-selected="false">
-        3. Technology Domains, Sprawl &amp; 6R Engine
+        3. 6R &amp; AI Matrix
       </button>
       <button class="tab-btn" data-tab="tab-databases" role="tab" aria-selected="false">
-        4. Databases Modernization &amp; Sankey Pathways
+        4. DB &amp; Network
       </button>
       <button class="tab-btn" data-tab="tab-scenarios" role="tab" aria-selected="false">
-        5. Financial Scenarios &amp; Cost Configurator
+        5. Financial TCO
       </button>
       <button class="tab-btn" data-tab="tab-waves-waf" role="tab" aria-selected="false">
-        6. Dependency Waves, WAF &amp; AI Advisor
+        6. Waves &amp; WAF
+      </button>
+      <button type="button" id="btn-toggle-single-page" class="tab-btn" style="color:var(--accent-blue); font-weight:700;" title="Show all tabs stacked on a single scrollable page">
+        &#128196; All on 1 Page
       </button>
     </nav>
 
     <!-- ======================================================================= -->
-    <!-- TAB 1 (FIRST PAGE): Dedicated File Upload & Specification View          -->
+    <!-- TAB 1 (MAIN PAGE): Minimal, Clean Google-Style File Upload Card         -->
     <!-- ======================================================================= -->
     <section id="tab-upload" class="tab-panel active" role="tabpanel">
-      <div style="max-width: 920px; margin: 1.5rem auto;">
-        <div class="card-panel" style="padding: 2.25rem; border: 2px solid var(--border-strong);">
-          <div style="text-align: center; margin-bottom: 1.75rem;">
-            <span class="badge-pill" style="font-size: 0.8rem; padding: 0.35rem 0.85rem;">Step 1 • Automated Infrastructure Discovery Ingestion</span>
-            <h1 style="font-size: 1.65rem; font-weight: 700; color: var(--text-primary); margin-top: 0.75rem; margin-bottom: 0.5rem;">
-              Please Load Your Infrastructure Discovery File to Begin
+      <div style="max-width: 640px; margin: 1.75rem auto;">
+        <div class="card-panel" style="padding: 2rem 2.25rem; border: 1px solid var(--border-subtle); border-radius: 12px; box-shadow: var(--shadow-sm);">
+          <div style="text-align: center; margin-bottom: 1.5rem;">
+            <h1 style="font-size: 1.4rem; font-weight: 600; color: var(--text-primary); margin: 0 0 0.4rem 0;">
+              Upload Infrastructure Discovery File
             </h1>
-            <p style="font-size: 0.95rem; color: var(--text-secondary); max-width: 720px; margin: 0 auto;">
-              Upload a discovery export file below to automatically analyze OS End-of-Support exposure, detect Zombie VMs (&lt;5% CPU), calculate compute right-sizing, and generate your customer's modernization report on <strong>Tab 2</strong>.
+            <p style="font-size: 0.88rem; color: var(--text-secondary); margin: 0;">
+              Upload a VMware RVTools (<code>vInfo</code>), Migration Center, or Server Inventory <code>.csv</code> file to generate your 6R Target Architecture &amp; TCO Assessment.
             </p>
           </div>
 
-          <!-- Clear Specification of Required File Type & Schema -->
-          <div style="background: var(--bg-elevated); border: 1px solid var(--border-strong); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1.5rem;">
-            <div style="font-weight: 700; font-size: 0.9rem; color: var(--accent-blue); margin-bottom: 0.5rem;">
-              &#128196; Required File Type &amp; Format Specifications:
+          <!-- Clean Minimal File Dropzone -->
+          <div id="page1-dropzone" style="border: 1.5px dashed var(--accent-blue); border-radius: 10px; padding: 1.6rem 1.25rem; text-align: center; background: var(--bg-elevated); margin-bottom: 1.25rem; cursor: pointer;">
+            <div style="font-size: 0.95rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.3rem;">
+              Select a <code>.CSV</code> or <code>.TXT</code> Discovery File
             </div>
-            <ul style="font-size: 0.84rem; color: var(--text-secondary); padding-left: 1.25rem; line-height: 1.65; margin-bottom: 0.75rem;">
-              <li><strong>Required File Format:</strong> <code>.CSV</code> (Comma-Separated Values) or <code>.TXT</code> (UTF-8 encoded, up to <code>10 MB</code>).</li>
-              <li><strong>Supported Discovery Tools:</strong>
-                <strong>VMware RVTools</strong> (<code>vInfo</code> / <code>vCPU</code> export),
-                <strong>Google Cloud Migration Center</strong> (Server Asset CSV),
-                <strong>DrMigrate</strong>, or standard server inventory spreadsheets.
-              </li>
-              <li><strong>Required CSV Columns:</strong>
-                <code style="font-family: var(--font-mono); font-size: 0.78rem; background: var(--bg-canvas); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border-subtle);">
-                  VM_Name, Application, OS_Version, vCPU, Memory_GB, Storage_TB, CPU_P95_Pct, Environment, Database_Engine, Software_Stack, Annual_Cost_USD
-                </code>
-              </li>
-            </ul>
-            <div style="display: flex; gap: 0.65rem; flex-wrap: wrap;">
-              <button type="button" id="page1-btn-download-template" class="btn btn-secondary" style="font-size: 0.78rem;">
-                &#11015; Download 50-Server RVTools .CSV Example
+            <div id="page1-file-status" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.85rem;">
+              Supports VMware RVTools, mFit, DrMigrate, or standard server inventory exports.
+            </div>
+            <div style="display:flex; justify-content:center; gap:0.6rem; flex-wrap:wrap;">
+              <label class="btn btn-primary" style="cursor: pointer; background:#1a73e8; border-color:#1a73e8; padding: 0.5rem 1.1rem; font-size: 0.84rem;">
+                Browse .CSV File
+                <input type="file" id="page1-file-input" accept=".csv,.txt" style="display: none;">
+              </label>
+              <button type="button" id="page1-btn-load-sample" class="btn btn-secondary" style="font-size: 0.84rem; padding: 0.5rem 1rem;">
+                Load 50-Server Sample
               </button>
-              <button type="button" id="page1-btn-load-sample" class="btn btn-secondary" style="font-size: 0.78rem;">
-                &#9889; Load 50-Server RVTools Discovery File (12 Apps)
+              <button type="button" id="page1-btn-download-template" class="btn btn-secondary" style="font-size: 0.84rem; padding: 0.5rem 0.9rem;">
+                &#11015; Template (.csv)
               </button>
             </div>
           </div>
 
-          <!-- Drag & Drop / File Picker Box -->
-          <div id="page1-dropzone" style="border: 2px dashed var(--accent-blue); border-radius: var(--radius-md); padding: 2rem; text-align: center; background: var(--bg-canvas); margin-bottom: 1.5rem; cursor: pointer; transition: background 0.15s ease;">
-            <div style="font-size: 2.2rem; margin-bottom: 0.5rem;">&#128193;</div>
-            <div style="font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.35rem;">
-              Click to Select a <code>.CSV</code> or <code>.TXT</code> Discovery File, or Drag &amp; Drop Here
-            </div>
-            <div id="page1-file-status" style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.9rem;">
-              No file loaded yet — select a local <code>.csv</code> / <code>.txt</code> export or click "Load Sample Discovery File" above.
-            </div>
-            <label class="btn btn-primary" style="cursor: pointer; display: inline-block; padding: 0.55rem 1.25rem; font-size: 0.88rem;">
-              Browse &amp; Load Discovery File (.CSV / .TXT)
-              <input type="file" id="page1-file-input" accept=".csv,.txt" style="display: none;">
-            </label>
-          </div>
-
-          <!-- Target Region & Customer Metadata for the Uploaded File -->
-          <div class="form-row" style="margin-bottom: 1rem;">
+          <!-- Compact 3-Column Assessment Scope -->
+          <div class="form-row" style="margin-bottom: 1rem; gap: 0.75rem;">
             <div class="form-field">
-              <label for="page1-client-name">Customer / Organization Name (Displayed on Tab 2)</label>
-              <input type="text" id="page1-client-name" placeholder="Enter Customer Organization Name..." value="Enterprise Client Assessment" class="form-input">
+              <label for="page1-client-name" style="font-size:0.76rem;">Customer Name</label>
+              <input type="text" id="page1-client-name" value="Enterprise Client Assessment" class="form-input" style="padding:6px 10px; font-size:0.84rem;">
             </div>
             <div class="form-field">
-              <label for="page1-industry">Industry Sector</label>
-              <input type="text" id="page1-industry" value="Enterprise &amp; Public Sector" class="form-input">
+              <label for="page1-industry" style="font-size:0.76rem;">Industry</label>
+              <input type="text" id="page1-industry" value="Enterprise &amp; Public Sector" class="form-input" style="padding:6px 10px; font-size:0.84rem;">
             </div>
             <div class="form-field">
-              <label for="page1-region">Target Google Cloud Region</label>
-              <select id="page1-region" class="select-input">
-                <option value="me-central1 (Doha, Qatar)" selected>me-central1 (Doha, Qatar — Sovereign)</option>
-                <option value="europe-west1 (Belgium)">europe-west1 (Belgium, EU)</option>
-                <option value="europe-west3 (Frankfurt, Germany)">europe-west3 (Frankfurt, Germany)</option>
-                <option value="europe-west2 (London, UK)">europe-west2 (London, UK)</option>
-                <option value="us-central1 (Iowa, USA)">us-central1 (Iowa, USA)</option>
+              <label for="page1-region" style="font-size:0.76rem;">Target GCP Region</label>
+              <select id="page1-region" class="select-input" style="padding:6px 10px; font-size:0.84rem;">
+                <option value="me-central1 (Doha, Qatar)" selected>me-central1 (Doha)</option>
+                <option value="europe-west1 (Belgium)">europe-west1 (Belgium)</option>
+                <option value="europe-west3 (Frankfurt, Germany)">europe-west3 (Frankfurt)</option>
+                <option value="europe-west2 (London, UK)">europe-west2 (London)</option>
+                <option value="us-central1 (Iowa, USA)">us-central1 (Iowa)</option>
               </select>
             </div>
           </div>
 
-          <div style="margin-bottom: 1.25rem;">
-            <label for="page1-csv-text" style="display:block; font-size:0.78rem; font-weight:600; color:var(--text-secondary); margin-bottom:0.4rem;">
-              Loaded Discovery File Content Preview (Editable CSV Telemetry):
-            </label>
-            <textarea id="page1-csv-text" rows="7" class="code-preview" placeholder="Paste or load a .CSV file with columns: VM_Name,Application,OS_Version,vCPU,Memory_GB,Storage_TB,CPU_P95_Pct,Environment,Database_Engine,Software_Stack,Annual_Cost_USD" style="width:100%; font-family:var(--font-mono); font-size:0.76rem; resize:vertical;"></textarea>
-          </div>
+          <!-- Optional Collapsible Preview so main page stays ultra-minimal -->
+          <details style="margin-bottom: 1.25rem; font-size: 0.78rem; color: var(--text-secondary);">
+            <summary style="cursor: pointer; font-weight: 600; padding: 0.3rem 0;">
+              Optional: View / Edit Raw CSV Telemetry &amp; Required Columns
+            </summary>
+            <div style="margin-top: 0.5rem;">
+              <div style="font-size: 0.74rem; color: var(--text-muted); margin-bottom: 0.35rem;">
+                Columns: <code>VM_Name, Application, OS_Version, vCPU, Memory_GB, Storage_TB, CPU_P95_Pct, Environment, Database_Engine, Software_Stack, Annual_Cost_USD</code>
+              </div>
+              <textarea id="page1-csv-text" rows="5" class="code-preview" style="width:100%; font-family:var(--font-mono); font-size:0.74rem; resize:vertical;"></textarea>
+            </div>
+          </details>
 
-          <div style="display: flex; justify-content: flex-end; gap: 0.75rem; align-items: center;">
-            <button type="button" id="page1-btn-skip-to-tab2" class="btn btn-secondary" style="font-size: 0.85rem;">
-              View Pre-Loaded Reference Estates on Tab 2 &rarr;
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; padding-top: 0.5rem; border-top: 1px solid var(--border-subtle);">
+            <button type="button" id="page1-btn-skip-to-tab2" class="btn btn-secondary" style="font-size: 0.82rem;">
+              Skip to Reference Estate &rarr;
             </button>
-            <button type="button" id="page1-btn-submit-upload" class="btn btn-primary" style="padding: 0.65rem 1.5rem; font-size: 0.92rem; font-weight: 700;">
-              &#128640; Analyze Loaded File &amp; Open Customer Report (Tab 2) &rarr;
+            <button type="button" id="page1-btn-submit-upload" class="btn btn-primary" style="background:#1a73e8; border-color:#1a73e8; padding: 0.6rem 1.4rem; font-size: 0.88rem; font-weight: 600;">
+              Analyze &amp; Generate 6R Assessment &rarr;
             </button>
           </div>
         </div>
