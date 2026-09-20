@@ -490,18 +490,31 @@ async function fetchAssessment() {
 
 async function askAIAdvisor(queryText) {
   const box = document.getElementById('ai-response-box');
-  box.innerHTML = `<div style="color:var(--text-secondary); font-size:0.85rem;">Consulting SPARK Principal Enterprise Architect on <em>"${queryText}"</em>...</div>`;
+  box.innerHTML = `<div style="color:var(--text-secondary); font-size:0.85rem;">&#10024; Querying live Google Cloud Vertex AI (<code>gemini-2.5-flash</code> in <code>imedtra-arch-modernization</code>) on <em>"${queryText}"</em>...</div>`;
   try {
     const res = await fetch('/api/ai-advisor', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ estate_id: state.estateId, query: queryText }),
+      body: JSON.stringify({
+        estate_id: state.estateId,
+        query: queryText,
+        client_assessment: state.assessment,
+      }),
     });
     const ans = await res.json();
-    const formattedAnswer = (ans.answer || '').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+    const formattedAnswer = (ans.answer || '')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/`(.*?)`/g, '<code style="font-family:var(--font-mono); color:var(--accent-cyan);">$1</code>')
+      .replace(/\n/g, '<br>');
+    const statusPill = ans.live_vertex_ai
+      ? `<span class="badge-6r badge-emerald">&#128994; Live Vertex AI Connected &bull; ${ans.model || 'vertex-ai/gemini-2.5-flash'} (${ans.location || 'europe-west1'})</span>`
+      : `<span class="badge-6r badge-amber">&#9889; Grounded Telemetry Engine</span>`;
     box.innerHTML = `
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.45rem;">
-        <span class="badge-6r badge-cyan">${ans.persona || 'SPARK AI Advisor'}</span>
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.55rem;">
+        <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+          <span class="badge-6r badge-cyan">${ans.persona || 'SPARK AI Advisor'}</span>
+          ${statusPill}
+        </div>
         <span style="font-size:0.75rem; color:#10b981; font-weight:600;">Recommended Action: ${ans.recommended_action || ''}</span>
       </div>
       <h4 style="font-size:0.95rem; font-weight:700; color:var(--text-primary); margin-bottom:0.45rem;">${ans.title}</h4>
@@ -1424,6 +1437,7 @@ async function sendVertexCopilotMessage(userText) {
         estate_id: state.estateId,
         query: userText,
         history: vertexChatHistory,
+        client_assessment: state.assessment,
       }),
     });
     const ans = await res.json();
@@ -1435,9 +1449,14 @@ async function sendVertexCopilotMessage(userText) {
       .replace(/`(.*?)`/g, '<code style="font-family:var(--font-mono); color:var(--accent-cyan);">$1</code>')
       .replace(/\n/g, '<br>');
 
+    const liveTag = ans.live_vertex_ai
+      ? `<span style="display:inline-block; background:rgba(16,185,129,0.14); color:#10b981; border:1px solid rgba(16,185,129,0.35); border-radius:4px; padding:1px 6px; font-size:10px; font-weight:700; margin-left:6px;">&#128994; Live ${ans.model || 'vertex-ai/gemini-2.5-flash'}</span>`
+      : `<span style="display:inline-block; background:rgba(245,158,11,0.14); color:#f59e0b; border-radius:4px; padding:1px 6px; font-size:10px; font-weight:700; margin-left:6px;">&#9889; Grounded Fallback</span>`;
+
     thinkingBubble.innerHTML = `
-      <div style="font-size:11px; font-weight:700; color:var(--accent-blue); margin-bottom:4px;">
-        &#10024; ${ans.persona || 'Vertex AI Principal Architect'}
+      <div style="font-size:11px; font-weight:700; color:var(--accent-blue); margin-bottom:5px; display:flex; align-items:center; flex-wrap:wrap; gap:4px;">
+        <span>&#10024; ${ans.persona || 'Vertex AI Principal Architect'}</span>
+        ${liveTag}
       </div>
       <div style="font-weight:700; margin-bottom:5px; color:var(--text-primary);">${ans.title || ''}</div>
       <div>${formatted}</div>

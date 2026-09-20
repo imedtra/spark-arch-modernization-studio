@@ -1090,30 +1090,38 @@ def _call_vertex_ai_gemini(
         "contents": contents,
         "generationConfig": {
             "temperature": 0.25,
-            "maxOutputTokens": 900,
+            "maxOutputTokens": 4096,
+            "thinkingConfig": {
+                "thinkingBudget": 256,
+            },
         },
     }
 
-    try:
-        req = urllib.request.Request(
-            url,
-            data=_json.dumps(payload).encode("utf-8"),
-            headers={
-                "Authorization": f"Bearer {token}",
-                "Content-Type": "application/json",
-            },
-            method="POST",
-        )
-        with urllib.request.urlopen(req, timeout=12.0) as resp:
-            body = _json.loads(resp.read().decode("utf-8"))
-            candidates = body.get("candidates", [])
-            if candidates:
-                parts = candidates[0].get("content", {}).get("parts", [])
-                answer_text = "".join(p.get("text", "") for p in parts).strip()
-                if answer_text:
-                    return answer_text
-    except Exception:
-        pass
+    for attempt in range(2):
+        try:
+            req = urllib.request.Request(
+                url,
+                data=_json.dumps(payload).encode("utf-8"),
+                headers={
+                    "Authorization": f"Bearer {token}",
+                    "Content-Type": "application/json",
+                },
+                method="POST",
+            )
+            with urllib.request.urlopen(req, timeout=25.0) as resp:
+                body = _json.loads(resp.read().decode("utf-8"))
+                candidates = body.get("candidates", [])
+                if candidates:
+                    parts = candidates[0].get("content", {}).get("parts", [])
+                    visible_parts = [p.get("text", "") for p in parts if not p.get("thought")]
+                    answer_text = "".join(visible_parts).strip()
+                    if not answer_text:
+                        answer_text = "".join(p.get("text", "") for p in parts).strip()
+                    if answer_text:
+                        return answer_text
+        except Exception:
+            if attempt == 0:
+                continue
 
     return None
 
@@ -1122,11 +1130,12 @@ def answer_ai_advisor_query(
     estate_id: str,
     query: str,
     history: Optional[List[Dict[str, str]]] = None,
+    client_assessment: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """Vertex AI Architecture Agent grounded in real-time estate telemetry (Slide 44)."""
     q = (query or "").strip()
     q_lower = q.lower()
-    assessment = compute_assessment(estate_id)
+    assessment = client_assessment if (isinstance(client_assessment, dict) and "estate" in client_assessment) else compute_assessment(estate_id)
     est = assessment["estate"]
     est_name = est["name"]
     fin = assessment["financial_business_case"]
@@ -1135,9 +1144,13 @@ def answer_ai_advisor_query(
     workloads = assessment.get("workloads", [])
 
     workload_summary = "; ".join(
-        f"{w['name']} ({w['servers']} VMs, {w['source_tech']} -> {w['active_6r']}: {w['active_gcp_service']}, saves ${w['annual_savings_usd']:,}/yr)"
+        f"{w['name']} ({w['servers']} VMs, {w['source_tech']} -> {w.get('active_6r', w.get('recommended_6r', 'Replatform'))}: {w.get('active_gcp_service', w.get('target_gcp_service', 'GCE'))}, saves ${w.get('annual_savings_usd', 0):,}/yr)"
         for w in workloads[:12]
     )
+
+    project_id = os.environ.get("GOOGLE_CLOUD_PROJECT", "imedtra-arch-modernization")
+    location = os.environ.get("VERTEX_AI_LOCATION", "europe-west1")
+    model_id = os.environ.get("VERTEX_AI_MODEL", "gemini-2.5-flash")
 
     system_prompt = (
         "You are the SPARK Principal Cloud Modernization AI Architect powered by Google Cloud Vertex AI. "
@@ -1149,7 +1162,7 @@ def answer_ai_advisor_query(
         f"{assessment['summary_metrics']['total_applications']} applications.\n"
         f"- Right-Sizing & Utilization: {ro.get('cores_before', 3625)} cores -> {ro.get('cores_after', 1150)} cores "
         f"(-{ro.get('cores_reduction_pct', 68)}%), RAM {ro.get('memory_before_tb', 11.0)} TB -> {ro.get('memory_after_tb', 2.2)} TB "
-        f"(-{ro.get('memory_reduction_pct', 80)}%), 54 Zombie VMs (<5% CPU), 292 OS EOL exposed servers.\n"
+        f"(-{ro.get('memory_reduction_pct', 80)}%), Zombie VMs (<5% CPU), OS EOL exposed servers.\n"
         f"- Financial Business Case: As-Is ${fin['as_is_annual_usd']:,}/yr -> Google Cloud Modernized ${fin['target_annual_usd']:,}/yr "
         f"(Annual Savings: ${fin['annual_savings_usd']:,}/yr, -{fin['savings_pct']}%, 3-Year Net Savings: ${fin['net_three_year_savings_usd']:,}, "
         f"Payback: {fin['payback_months']} months).\n"
@@ -1158,14 +1171,16 @@ def answer_ai_advisor_query(
         "Provide concise, actionable, executive-ready guidance with concrete numbers from this estate."
     )
 
-    # 1. Attempt live Vertex AI Gemini call first
+    # 1. Execute live Vertex AI Gemini call on every request
     vertex_answer = _call_vertex_ai_gemini(system_prompt, q or "Provide an executive modernization summary.", history)
     if vertex_answer:
         return {
-            "persona": "Vertex AI Principal Cloud Architect (gemini-2.5-flash)",
-            "model": "vertex-ai/gemini-2.5-flash",
+            "persona": f"Vertex AI Principal Cloud Architect ({model_id})",
+            "model": f"vertex-ai/{model_id}",
+            "project_id": project_id,
+            "location": location,
             "live_vertex_ai": True,
-            "title": f"Vertex AI Grounded Analysis — {est_name}",
+            "title": f"Vertex AI Live Grounded Analysis — {est_name}",
             "answer": vertex_answer,
             "recommended_action": "Review the 6R Treatment & Wave Plan or export the Terraform HCL blueprint to execute this recommendation.",
         }
@@ -1575,8 +1590,37 @@ def api_ai_advisor() -> Any:
     estate_id = payload.get("estate_id", "enterprise-reference-estate")
     query = payload.get("query") or payload.get("question") or ""
     history = payload.get("history")
-    response = answer_ai_advisor_query(estate_id, query, history=history)
+    client_assessment = payload.get("client_assessment")
+    response = answer_ai_advisor_query(
+        estate_id=estate_id,
+        query=query,
+        history=history,
+        client_assessment=client_assessment,
+    )
     return jsonify(response)
+
+
+@app.route("/api/vertex-status", methods=["GET"])
+def api_vertex_status() -> Any:
+    """Verifies live Google Cloud Vertex AI connectivity and returns project/model telemetry."""
+    project_id = os.environ.get("GOOGLE_CLOUD_PROJECT", "imedtra-arch-modernization")
+    location = os.environ.get("VERTEX_AI_LOCATION", "europe-west1")
+    model_id = os.environ.get("VERTEX_AI_MODEL", "gemini-2.5-flash")
+    token = _get_gcp_access_token()
+    return jsonify({
+        "status": "connected" if token else "offline_fallback",
+        "live_vertex_ai_enabled": bool(token),
+        "project_id": project_id,
+        "location": location,
+        "model": f"vertex-ai/{model_id}",
+        "enabled_apis": [
+            "aiplatform.googleapis.com",
+            "discoveryengine.googleapis.com",
+            "dialogflow.googleapis.com",
+            "generativelanguage.googleapis.com",
+            "cloudaicompanion.googleapis.com",
+        ],
+    })
 
 
 
