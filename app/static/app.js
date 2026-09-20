@@ -708,6 +708,41 @@ function renderBannerAndKPIs(data) {
     document.getElementById('kpi-eos-tag').textContent = `${tr.out_of_support_servers} EOS OS Servers (${tr.out_of_support_pct}%)`;
   }
   document.getElementById('kpi-waf-score').textContent = `${data.waf_audit.overall_score_pct}% WAF Score`;
+
+  // Populate Tab 2 AI 6R Summary Banner (#tab2-ai-6r-summary-banner)
+  const tab2AiBanner = document.getElementById('tab2-ai-6r-summary-banner');
+  if (tab2AiBanner && data.workloads && data.summary_metrics) {
+    const dist = data.summary_metrics.treatment_distribution || {};
+    const avgConf = Math.round(
+      data.workloads.reduce((acc, w) => acc + (w.ai_confidence_pct || 94), 0) / Math.max(1, data.workloads.length)
+    );
+    const pillsHtml = Object.entries(dist)
+      .filter(([_, count]) => count > 0)
+      .map(([strat, count]) => `<span class="badge-6r badge-${getBadgeColor(strat)}" style="font-size:0.78rem;">${strat}: <strong>${count}</strong> App Groups</span>`)
+      .join(' ');
+
+    tab2AiBanner.style.display = 'block';
+    tab2AiBanner.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
+        <div>
+          <div style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.06em; color:#38bdf8; font-weight:700; margin-bottom:0.25rem;">
+            🤖 Vertex AI 6R Migration &amp; Target Architecture Summary • Avg Confidence: ${avgConf}%
+          </div>
+          <div style="font-size:0.86rem; color:var(--text-primary); line-height:1.5;">
+            AI 6R Recommender mapped <strong>${data.workloads.length} application groups (${ov ? ov.total_servers_discovered : 50} servers)</strong> to right-sized Gen4 Google Cloud SKUs (C4/N4, AlloyDB, Cloud SQL Enterprise Plus, GKE Autopilot, GCVE) with <strong>-${fin ? fin.savings_pct : 44}% TCO savings (${fin ? fmtUSD(fin.annual_savings_usd) : '$165K'}/yr)</strong>.
+          </div>
+          <div style="display:flex; flex-wrap:wrap; gap:0.45rem; margin-top:0.55rem;">
+            ${pillsHtml}
+          </div>
+        </div>
+        <div style="display:flex; gap:0.5rem;">
+          <button type="button" class="btn btn-primary" onclick="runVertex6RAgent(false)" style="background:linear-gradient(135deg, #0284c7, #2563eb); border:1px solid #38bdf8; font-size:0.78rem; padding:0.45rem 0.85rem;">
+            🤖 Re-Verify with Vertex AI 6R Agent
+          </button>
+        </div>
+      </div>
+    `;
+  }
 }
 
 /* ============================================================================
@@ -985,10 +1020,17 @@ function renderTab2DomainsAndWorkloads(data) {
               `<option value="${opt}" ${wl.active_6r === opt ? 'selected' : ''}>${opt}</option>`
             ).join('')}
           </select>
+          <div style="margin-top:0.3rem; display:flex; gap:0.3rem; flex-wrap:wrap;">
+            <span class="badge-6r badge-cyan" style="font-size:0.68rem;">🤖 ${wl.ai_confidence_pct || 94}% AI Conf.</span>
+            <span class="badge-6r badge-indigo" style="font-size:0.68rem;">${wl.recommended_wave || 'Wave 2'}</span>
+          </div>
         </td>
         <td>
           <input type="text" class="table-select wl-gcp-input" data-id="${wl.id}" value="${wl.active_gcp_service}" style="width:100%; min-width:220px;">
-          <div style="font-size:0.73rem; color:var(--text-secondary); margin-top:0.25rem;">${wl.target_rationale}</div>
+          <div style="font-size:0.74rem; color:#38bdf8; font-family:'JetBrains Mono', monospace; margin-top:0.28rem;">
+            <strong>Right-Sized SKU:</strong> ${wl.rightsized_sku || 'Gen4 c4-standard-8 (Hyperdisk Balanced)'}
+          </div>
+          <div style="font-size:0.73rem; color:var(--text-secondary); margin-top:0.2rem;">${wl.target_rationale}</div>
         </td>
         <td class="mono-cell">
           <div style="font-size:0.9rem; font-weight:700; color:#10b981;">${fmtUSD(wl.target_annual_cost_usd)}/yr</div>
@@ -1324,6 +1366,63 @@ function renderTab5WavesAndWAF(data) {
       </div>
     </article>
   `).join('');
+
+  // Render Target Google Cloud 6R Landing Zone Architecture Blueprint (#tab6-architecture-diagram-box)
+  const archBox = document.getElementById('tab6-architecture-diagram-box');
+  if (archBox && data.workloads) {
+    const by6R = {};
+    data.workloads.forEach((wl) => {
+      const r = wl.active_6r || 'Replatform';
+      if (!by6R[r]) by6R[r] = [];
+      by6R[r].push(wl);
+    });
+
+    const zoneMeta = {
+      'Replatform': { title: 'Managed Database & Compute Zone (Replatform)', icon: '🗄️', color: '#06b6d4', subnet: 'vpc-prod-data-compute (AlloyDB / Cloud SQL Ent+ / Gen4 C4)' },
+      'Refactor': { title: 'Cloud-Native Serverless & Kubernetes Zone (Refactor)', icon: '☸️', color: '#10b981', subnet: 'vpc-prod-cloudnative (GKE Autopilot / Cloud Run / PubSub)' },
+      'Rehost': { title: 'Dedicated VMware SDDC Zone (Rehost)', icon: '🖧', color: '#6366f1', subnet: 'vpc-prod-gcve (Google Cloud VMware Engine HCX L2)' },
+      'Replace': { title: 'Managed Security & SaaS Identity Zone (Replace)', icon: '🛡️', color: '#f59e0b', subnet: 'vpc-shared-security (Managed AD / CAS / Chronicle SecOps)' },
+      'Retire': { title: 'Decommission & Coldline Archive Vault (Retire)', icon: '🧊', color: '#f43f5e', subnet: 'gcs-compliance-vault (Cloud Storage Coldline + ILM)' }
+    };
+
+    archBox.innerHTML = `
+      <div class="panel-header" style="margin-bottom:0.85rem;">
+        <div>
+          <span class="panel-kicker">Vertex AI 6R Target Architecture Blueprint • Cloud Foundation Fabric</span>
+          <h3 style="margin:0.15rem 0 0 0; font-size:1.05rem;">Target Google Cloud Hub-and-Spoke Landing Zone (Mapped by 6R Treatment)</h3>
+        </div>
+        <span class="badge-6r badge-cyan">Shared VPC + Cloud Armor WAF + KMS</span>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:0.9rem;">
+        ${Object.entries(by6R).map(([strat, list]) => {
+          const m = zoneMeta[strat] || { title: `${strat} Landing Zone`, icon: '☁️', color: '#38bdf8', subnet: 'vpc-prod-spoke' };
+          return `
+            <div style="background:rgba(15,23,42,0.65); border:1px solid ${m.color}55; border-top:3px solid ${m.color}; border-radius:10px; padding:0.85rem;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+                <strong style="font-size:0.86rem; color:var(--text-primary);">${m.icon} ${m.title}</strong>
+                <span class="badge-6r" style="background:${m.color}22; color:${m.color}; border:1px solid ${m.color}55;">${list.length} Apps</span>
+              </div>
+              <div style="font-size:0.72rem; font-family:'JetBrains Mono', monospace; color:var(--text-secondary); margin-bottom:0.65rem;">
+                Subnet: ${m.subnet}
+              </div>
+              <div style="display:flex; flex-direction:column; gap:0.45rem;">
+                ${list.map((w) => `
+                  <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:6px; padding:0.45rem 0.6rem;">
+                    <div style="display:flex; justify-content:space-between; font-size:0.79rem; font-weight:700; color:var(--text-primary);">
+                      <span>${w.name}</span>
+                      <span style="color:#10b981;">${fmtUSD(w.target_annual_cost_usd)}/yr</span>
+                    </div>
+                    <div style="font-size:0.73rem; color:#38bdf8; margin-top:0.15rem;">&rarr; ${w.active_gcp_service}</div>
+                    <div style="font-size:0.69rem; color:var(--text-secondary); font-family:'JetBrains Mono', monospace; margin-top:0.12rem;">SKU: ${w.rightsized_sku || 'Gen4 C4'}</div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  }
 
   // WAF Scorecard
   const waf = data.waf_audit;

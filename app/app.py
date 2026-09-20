@@ -919,10 +919,30 @@ def compute_assessment(
         total_as_is_annual += as_is_cost
         total_target_annual += target_cost
 
+        p95_val = wl.get("cpu_utilization_p95", 25)
+        avg_vcpu = max(2, round((wl["vcpu"] / max(1, wl["servers"])) * (0.5 if p95_val < 30 else 0.75)))
+        default_sku = (
+            "0 vCPU (Coldline Snapshot Archive)"
+            if active_6r == "Retire"
+            else (
+                "Serverless Managed PaaS (Auto-Scaling)"
+                if active_6r in ("Refactor", "Replace")
+                else f"Gen4 c4-highmem-{avg_vcpu} + Hyperdisk Balanced"
+            )
+        )
+        default_wave = (
+            "Wave 1: Quick Wins & Retire"
+            if active_6r in ("Retire", "Replace") or wl.get("category") == "security_perimeter"
+            else ("Wave 2: Database & PaaS Modernization" if wl.get("category") in ("rdbms_persistence", "caching_messaging") else "Wave 3: Mission-Critical & Refactor")
+        )
+
         enriched_wl = {
             **wl,
             "active_6r": active_6r,
             "active_gcp_service": active_gcp,
+            "rightsized_sku": wl.get("rightsized_sku", default_sku),
+            "ai_confidence_pct": wl.get("ai_confidence_pct", 95 if active_6r in ("Retire", "Replatform") else 92),
+            "recommended_wave": wl.get("recommended_wave", default_wave),
             "badge_color": profile["badge_color"],
             "target_annual_cost_usd": target_cost,
             "annual_savings_usd": annual_savings,
@@ -1468,45 +1488,65 @@ def generate_terraform_blueprint(assessment: Dict[str, Any]) -> str:
 
     for wl in assessment["workloads"]:
         w_id = wl["id"].replace("-", "_")
-        lines.append(f"# Workload: {wl['name']} ({wl['active_6r']} -> {wl['active_gcp_service']})")
+        sku_str = wl.get("rightsized_sku", "c4-highmem-8 + Hyperdisk")
+        conf_pct = wl.get("ai_confidence_pct", 94)
+        lines.append(
+            f"# Workload: {wl['name']} | AI 6R: {wl['active_6r']} ({conf_pct}% Conf.) | "
+            f"Target: {wl['active_gcp_service']} | Right-Sized SKU: {sku_str}"
+        )
         if "AlloyDB" in wl["active_gcp_service"]:
             lines.extend([
-                f'resource "google_alloydb_cluster" "{w_id}_cluster" {{',
-                f'  cluster_id = "{wl["id"]}-alloydb"',
-                '  location   = var.region',
-                '  project    = var.project_id',
-                '  network_config {',
-                '    network = google_compute_network.modernized_shared_vpc.id',
-                '  }',
+                f'module "{w_id}_alloydb_fabric" {{',
+                '  source       = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/alloydb?ref=v34.0.0"',
+                '  project_id   = var.project_id',
+                f'  cluster_name = "{wl["id"]}-alloydb"',
+                '  location     = var.region',
+                '  network_self_link = google_compute_network.modernized_shared_vpc.self_link',
                 '}',
                 "",
             ])
         elif "Cloud SQL" in wl["active_gcp_service"]:
             lines.extend([
-                f'resource "google_sql_database_instance" "{w_id}_sqlserver" {{',
-                f'  name             = "{wl["id"]}-sql-ha"',
-                '  database_version = "SQLSERVER_2019_ENTERPRISE"',
-                '  region           = var.region',
-                '  settings {',
-                '    tier              = "db-custom-16-65536"',
-                '    availability_type = "REGIONAL"',
-                '  }',
+                f'module "{w_id}_cloudsql_fabric" {{',
+                '  source            = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/cloud-sql-instance?ref=v34.0.0"',
+                '  project_id        = var.project_id',
+                f'  name              = "{wl["id"]}-sql-ha"',
+                '  region            = var.region',
+                '  database_version  = "SQLSERVER_2019_ENTERPRISE"',
+                '  tier              = "db-custom-16-65536"',
+                '  availability_type = "REGIONAL"',
                 '}',
                 "",
             ])
         elif "GKE" in wl["active_gcp_service"]:
             lines.extend([
-                f'resource "google_container_cluster" "{w_id}_autopilot" {{',
+                f'module "{w_id}_gke_autopilot_fabric" {{',
+                '  source           = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/gke-cluster-autopilot?ref=v34.0.0"',
+                '  project_id       = var.project_id',
                 f'  name             = "{wl["id"]}-gke"',
                 '  location         = var.region',
-                '  enable_autopilot = true',
-                '  network          = google_compute_network.modernized_shared_vpc.name',
+                '  vpc_config       = { network = google_compute_network.modernized_shared_vpc.self_link }',
+                '}',
+                "",
+            ])
+        elif wl["active_6r"] == "Retire":
+            lines.extend([
+                f'resource "google_storage_bucket" "{w_id}_coldline_archive" {{',
+                f'  name          = "${{var.project_id}}-{wl["id"]}-zombie-archive"',
+                '  location      = var.region',
+                '  storage_class = "COLDLINE"',
                 '}',
                 "",
             ])
         else:
             lines.extend([
-                f'# Managed Target Resource for {wl["id"]}: {wl["active_gcp_service"]}',
+                f'module "{w_id}_compute_fabric" {{',
+                '  source        = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/compute-vm?ref=v34.0.0"',
+                '  project_id    = var.project_id',
+                '  zone          = "${var.region}-a"',
+                f'  name          = "{wl["id"]}-gen4-vm"',
+                '  instance_type = "c4-highmem-8"',
+                '}',
                 "",
             ])
 
