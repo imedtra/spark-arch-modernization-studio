@@ -1939,6 +1939,29 @@ def api_ai_6r_agent() -> Any:
 
 
 
+@app.before_request
+def verify_iap_googler_identity() -> Any:
+    """Enforces that IAP-authenticated users belong to @google.com or @imedtra.altostrat.com."""
+    iap_email_header = request.headers.get("X-Goog-Authenticated-User-Email", "").strip().lower()
+    if iap_email_header:
+        # Format is typically "accounts.google.com:username@google.com"
+        email = iap_email_header.split(":")[-1]
+        allowed_domains = ("@google.com", "@imedtra.altostrat.com", "@altostrat.com")
+        if not any(email.endswith(dom) for dom in allowed_domains):
+            return (
+                f"""<!DOCTYPE html><html><head><title>Googler Access Required</title>
+                <style>body{{background:#050505;color:#f8fafc;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;}}
+                .card{{background:#111;border:1px solid #334155;border-radius:12px;padding:2rem;max-width:520px;text-align:center;}}
+                a.btn{{display:inline-block;margin-top:1.2rem;padding:0.65rem 1.2rem;background:#0284c7;color:#fff;text-decoration:none;border-radius:6px;font-weight:600;}}</style></head>
+                <body><div class="card"><h2>🔒 Access Restricted to Googlers (@google.com)</h2>
+                <p>You are currently signed in as <strong>{email}</strong>, which is outside the <code>@google.com</code> organization.</p>
+                <p>Please switch to your corporate <strong>@google.com</strong> account to access SPARK Architecture Modernization Studio.</p>
+                <a class="btn" href="/_gcp_gatekeeper/clear_login_cookie">Switch to @google.com Account</a></div></body></html>""",
+                403,
+            )
+    return None
+
+
 @app.route("/api/export-markdown", methods=["POST"])
 def api_export_markdown() -> Any:
     """Generates a complete Executive & Technical Assessment Markdown report."""
