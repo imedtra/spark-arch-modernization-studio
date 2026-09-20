@@ -15,7 +15,9 @@ import copy
 import csv
 import datetime
 import io
+import json
 import os
+import urllib.request
 from typing import Any, Dict, List, Optional
 from flask import Flask, jsonify, request, send_from_directory
 
@@ -1045,11 +1047,34 @@ def _get_gcp_access_token() -> Optional[str]:
             headers={"Metadata-Flavor": "Google"},
         )
         with urllib.request.urlopen(req, timeout=1.5) as resp:
-            data = _json.loads(resp.read().decode("utf-8"))
+            data = json.loads(resp.read().decode("utf-8"))
             if data.get("access_token"):
                 return data["access_token"]
     except Exception:
         pass
+
+    # 2. Try Local ADC credentials file (when running locally outside Forge unit tests)
+    if not os.environ.get("TEST_TMPDIR") and not os.environ.get("UNITTEST_ON_BORG"):
+        try:
+            import urllib.parse
+            adc_path = os.path.expanduser("~/.config/gcloud/application_default_credentials.json")
+            if os.path.exists(adc_path):
+                with open(adc_path, "r", encoding="utf-8") as f:
+                    adc = json.load(f)
+                if adc.get("refresh_token") and adc.get("client_id") and adc.get("client_secret"):
+                    form_data = urllib.parse.urlencode({
+                        "client_id": adc["client_id"],
+                        "client_secret": adc["client_secret"],
+                        "refresh_token": adc["refresh_token"],
+                        "grant_type": "refresh_token",
+                    }).encode("utf-8")
+                    t_req = urllib.request.Request("https://oauth2.googleapis.com/token", data=form_data, method="POST")
+                    with urllib.request.urlopen(t_req, timeout=3.0) as t_resp:
+                        tok_data = json.loads(t_resp.read().decode("utf-8"))
+                        if tok_data.get("access_token"):
+                            return tok_data["access_token"]
+        except Exception:
+            pass
 
     return None
 
