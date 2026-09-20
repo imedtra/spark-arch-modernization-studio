@@ -94,6 +94,19 @@ class EngineTest(unittest.TestCase):
         self.assertGreaterEqual(res["estate_overview"]["utilization_summary"]["zombie_servers_under_5_count"], 3)
         self.assertGreater(res["migration_scenarios"]["scenario_2_modernize"]["annual_savings_usd"], 0)
 
+    def test_vertex_6r_migration_agent(self):
+        result = app_mod.run_vertex_6r_migration_agent("enterprise-reference-estate")
+        self.assertEqual(result["status"], "ok")
+        self.assertGreater(len(result["recommendations"]), 0)
+        for rec in result["recommendations"]:
+            self.assertIn(
+                rec["recommended_6r"],
+                ["Rehost", "Replatform", "Refactor", "Replace", "Retain", "Retire"],
+            )
+            self.assertTrue(rec["target_gcp_service"])
+            self.assertTrue(rec["rightsized_sku"])
+            self.assertGreaterEqual(rec["confidence_pct"], 80)
+
 
 if __name__ == "__main__":
     unittest.main()

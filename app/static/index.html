@@ -37,6 +37,9 @@
         <button type="button" class="bg-swatch-btn" data-bgcolor="#000000" style="width:auto; height:auto; border-radius:4px; padding:3px 9px; font-size:11.5px; font-weight:600; background:#000000; color:#f8fafc; border:1px solid #334155;" title="Black Background">&#127769; Black</button>
       </div>
 
+      <button id="btn-header-ai-6r" class="btn btn-primary" style="background:linear-gradient(135deg,#0284c7,#2563eb);" title="Run Vertex AI 6R Target Recommender Agent across all workloads">
+        &#129302; Run AI 6R Agent
+      </button>
       <button id="btn-ingest-data" class="btn btn-secondary" title="Open Discovery File Upload Modal">
         &#128229; Quick Upload Modal
       </button>
@@ -344,8 +347,28 @@
         <!-- Populated by app.js -->
       </div>
 
+      <!-- Vertex AI 6R Target Recommender Agent Execution Card -->
+      <div class="card-panel" style="margin-top:1.25rem; border:2px solid var(--accent-blue); background:var(--bg-elevated);">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+          <div>
+            <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.25rem;">
+              <span class="badge-6r badge-cyan">&#129302; Vertex AI 6R Migration Agent (gemini-2.5-flash)</span>
+              <span id="ai-6r-agent-status-badge" class="badge-6r badge-emerald">&#128994; Ready &bull; Structured JSON 6R Target Recommender</span>
+            </div>
+            <h3 class="panel-title" style="margin:0;">Automated 6R Target &amp; Gen4 Machine-Shape Recommendation Agent</h3>
+            <p class="section-subtitle" style="margin-top:0.2rem;">
+              Uses live <strong>Google Cloud Vertex AI (<code>gemini-2.5-flash</code>)</strong> to evaluate each workload's CPU P95 utilization, OS/Database EOL risk, and architecture stack, automatically assigning the optimal <strong>6R Strategy (Rehost, Replatform, Refactor, Replace, Retain, Retire)</strong>, <strong>Google Cloud Target Service</strong>, and <strong>Right-Sized Gen4 SKU</strong>.
+            </p>
+          </div>
+          <button type="button" id="btn-run-ai-6r-agent" class="btn btn-primary" style="padding:0.65rem 1.35rem; font-weight:700; font-size:0.88rem; white-space:nowrap;">
+            &#10024; Run Vertex AI 6R Target Recommender Agent
+          </button>
+        </div>
+        <div id="ai-6r-agent-results-box" style="margin-top:0.85rem; display:none; padding-top:0.85rem; border-top:1px solid var(--border-subtle);"></div>
+      </div>
+
       <!-- Interactive Application Portfolio & 6R Precision Table -->
-      <div class="card-panel" style="margin-top:1.5rem;">
+      <div class="card-panel" style="margin-top:1.25rem;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.85rem;">
           <div>
             <h3 class="panel-title" style="margin:0;">Workload Portfolio &amp; Interactive 6R Treatment Engine</h3>

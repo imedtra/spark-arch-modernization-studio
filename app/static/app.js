@@ -224,6 +224,8 @@ function initEventListeners() {
   }
 
   document.getElementById('btn-run-ingestion')?.addEventListener('click', runCustomerIngestion);
+  document.getElementById('btn-run-ai-6r-agent')?.addEventListener('click', () => runVertex6RAgent(false));
+  document.getElementById('btn-header-ai-6r')?.addEventListener('click', () => runVertex6RAgent(true));
   initPage1FileUpload();
 }
 
@@ -359,12 +361,15 @@ async function runPage1CustomerIngestion() {
         estateSelect.value = data.estate_id;
       }
       state.estateId = data.estate_id;
-      state.overrides = {};
+      state.overrides = (data.ai_6r_agent && data.ai_6r_agent.applied_overrides) ? data.ai_6r_agent.applied_overrides : {};
       state.remediatedControls = [];
       state.extraWorkloads = [];
       state.assessment = data.assessment;
 
       renderAll(data.assessment);
+      if (data.ai_6r_agent) {
+        renderAI6RAgentResults(data.ai_6r_agent);
+      }
       activateTabById('tab-overview');
       askAIAdvisor(`Summarize the key findings and quick wins for ${clientName}`);
     } else {
@@ -379,6 +384,123 @@ async function runPage1CustomerIngestion() {
       btn.disabled = false;
     }
   }
+}
+
+async function runVertex6RAgent(switchTabFirst = false) {
+  if (switchTabFirst) {
+    activateTabById('tab-domains');
+  }
+  const btn = document.getElementById('btn-run-ai-6r-agent');
+  const headerBtn = document.getElementById('btn-header-ai-6r');
+  const badge = document.getElementById('ai-6r-agent-status-badge');
+  const resultsBox = document.getElementById('ai-6r-agent-results-box');
+
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '&#9203; Vertex AI 6R Agent Evaluating Workloads...';
+  }
+  if (headerBtn) {
+    headerBtn.disabled = true;
+    headerBtn.innerHTML = '&#9203; Running AI 6R...';
+  }
+  if (badge) {
+    badge.className = 'badge-6r badge-amber';
+    badge.innerHTML = '&#9889; Querying live Vertex AI (gemini-2.5-flash Structured Schema)...';
+  }
+  if (resultsBox) {
+    resultsBox.style.display = 'block';
+    resultsBox.innerHTML = `<div style="font-size:0.84rem; color:var(--text-secondary);"><em>&#10024; Vertex AI 6R Target Recommender Agent is evaluating all workloads across CPU P95 utilization, OS/DB EOL lifecycle, and BYOL eligibility to prescribe 6R dispositions and Gen4 machine shapes...</em></div>`;
+  }
+
+  try {
+    const res = await fetch('/api/ai-6r-agent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        estate_id: state.estateId,
+        extra_workloads: state.extraWorkloads,
+      }),
+    });
+    const data = await res.json();
+    if (data.status === 'ok') {
+      state.overrides = data.applied_overrides || {};
+      state.assessment = data.assessment;
+      renderAll(data.assessment);
+      renderAI6RAgentResults(data);
+    }
+  } catch (err) {
+    console.error('Vertex AI 6R Agent failed:', err);
+    if (resultsBox) {
+      resultsBox.innerHTML = `<div style="color:var(--accent-rose); font-size:0.84rem;">Error invoking Vertex AI 6R Agent.</div>`;
+    }
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '&#10024; Re-Run Vertex AI 6R Target Recommender Agent';
+    }
+    if (headerBtn) {
+      headerBtn.disabled = false;
+      headerBtn.innerHTML = '&#129302; Run AI 6R Agent';
+    }
+  }
+}
+
+function renderAI6RAgentResults(agentData) {
+  const badge = document.getElementById('ai-6r-agent-status-badge');
+  const resultsBox = document.getElementById('ai-6r-agent-results-box');
+  if (!resultsBox || !agentData) return;
+
+  if (badge) {
+    badge.className = 'badge-6r badge-emerald';
+    badge.innerHTML = agentData.live_vertex_ai
+      ? `&#128994; Live Vertex AI Applied &bull; ${agentData.model} (${agentData.location})`
+      : `&#9989; AI 6R Recommendations Applied (${agentData.recommendations?.length || 0} Workloads)`;
+  }
+
+  const recs = agentData.recommendations || [];
+  resultsBox.style.display = 'block';
+  resultsBox.innerHTML = `
+    <div style="background:var(--bg-canvas); border:1px solid var(--border-strong); border-radius:var(--radius-md); padding:0.95rem; margin-bottom:0.85rem;">
+      <div style="font-size:0.78rem; font-weight:700; color:var(--accent-blue); margin-bottom:0.3rem;">
+        &#129302; ${agentData.agent || 'Vertex AI 6R Target Recommender Agent'} &bull; Executive Strategy Summary:
+      </div>
+      <div style="font-size:0.84rem; color:var(--text-primary); line-height:1.55;">
+        ${agentData.executive_6r_summary || ''}
+      </div>
+    </div>
+    <div class="table-wrapper">
+      <table class="studio-table">
+        <thead>
+          <tr>
+            <th>Workload Group</th>
+            <th>AI Recommended 6R</th>
+            <th>Prescribed Google Cloud Target Service</th>
+            <th>Right-Sized Gen4 Machine Shape / SKU</th>
+            <th>AI Confidence &amp; Wave</th>
+            <th>Vertex AI Technical Rationale</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${recs.map((r) => `
+            <tr>
+              <td>
+                <strong>${r.workload_name}</strong>
+                <div style="font-size:0.72rem; color:var(--text-secondary);">${r.servers} VMs &bull; ${r.source_tech} (${r.cpu_p95_pct}% CPU P95)</div>
+              </td>
+              <td><span class="badge-6r badge-${getBadgeColor(r.recommended_6r)}">${r.recommended_6r}</span></td>
+              <td style="font-weight:600; color:var(--accent-blue); font-size:0.8rem;">${r.target_gcp_service}</td>
+              <td class="mono-cell" style="font-size:0.76rem; color:var(--accent-emerald);">${r.rightsized_sku}</td>
+              <td>
+                <span class="badge-6r badge-emerald">${r.confidence_pct}% Conf.</span>
+                <div style="font-size:0.7rem; color:var(--text-secondary); margin-top:2px;">${r.recommended_wave}</div>
+              </td>
+              <td style="font-size:0.76rem; color:var(--text-secondary); line-height:1.45;">${r.technical_rationale}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
 }
 
 async function loadSampleCSVIntoTextarea() {

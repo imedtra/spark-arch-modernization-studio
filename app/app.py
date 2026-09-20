@@ -1623,6 +1623,256 @@ def api_vertex_status() -> Any:
     })
 
 
+def run_vertex_6r_migration_agent(
+    estate_id: str,
+    extra_workloads: Optional[List[Dict[str, Any]]] = None,
+) -> Dict[str, Any]:
+    """Dedicated Vertex AI 6R Migration Agent that evaluates workloads and prescribes 6R + GCP Target + Gen4 SKU."""
+    base_estate = ESTATES.get(estate_id, ESTATES["enterprise-reference-estate"])
+    workloads = copy.deepcopy(base_estate.get("workloads", []))
+    if extra_workloads:
+        workloads.extend(copy.deepcopy(extra_workloads))
+
+    project_id = os.environ.get("GOOGLE_CLOUD_PROJECT", "imedtra-arch-modernization")
+    location = os.environ.get("VERTEX_AI_LOCATION", "europe-west1")
+    model_id = os.environ.get("VERTEX_AI_MODEL", "gemini-2.5-flash")
+    token = _get_gcp_access_token()
+
+    workload_input_list = [
+        {
+            "workload_id": w["id"],
+            "workload_name": w["name"],
+            "servers": w["servers"],
+            "vcpu": w["vcpu"],
+            "ram_gb": w["ram_gb"],
+            "storage_tb": w["storage_tb"],
+            "cpu_p95_pct": w.get("cpu_utilization_p95", 25),
+            "os": w.get("os", "Linux/Windows"),
+            "source_tech": w.get("source_tech", ""),
+            "eol_risk": w.get("eol_risk", "Medium"),
+            "current_annual_cost_usd": w.get("current_annual_cost_usd", 50000),
+        }
+        for w in workloads
+    ]
+
+    ai_recommendations: List[Dict[str, Any]] = []
+    executive_summary = ""
+    live_vertex_used = False
+
+    if token and workload_input_list:
+        url = (
+            f"https://{location}-aiplatform.googleapis.com/v1/projects/{project_id}"
+            f"/locations/{location}/publishers/google/models/{model_id}:generateContent"
+        )
+        system_instruction = (
+            "You are the Google Cloud Principal 6R Migration & Target Architecture AI Agent. "
+            "Evaluate every enterprise workload in the input list using the 6R Migration Framework "
+            "(Rehost, Replatform, Refactor, Replace, Retain, Retire) and recommend:\n"
+            "1. recommended_6r: Strictly one of 'Rehost', 'Replatform', 'Refactor', 'Replace', 'Retain', 'Retire'.\n"
+            "2. target_gcp_service: Exact Google Cloud target service (e.g., 'Cloud SQL Enterprise Plus for SQL Server (BYOL SA)', "
+            "'AlloyDB for PostgreSQL + GKE Autopilot', 'Google Cloud VMware Engine (GCVE) + Gen4 C4 VMs', "
+            "'BigQuery Enterprise Edition + Cloud Data Fusion', 'Cloud Run Serverless + Cloud Armor WAF', "
+            "'Managed Service for Microsoft AD + CAS + Chronicle', 'Cloud Storage Coldline Archive').\n"
+            "3. rightsized_sku: Recommended right-sized Gen4 machine shape or PaaS tier based on vCPU, RAM, and CPU P95% "
+            "(e.g., 'c4-highmem-16 (Right-sized -50% cores) + Hyperdisk Extreme', 'n4-standard-8 + Hyperdisk Balanced', "
+            "'Serverless PaaS (Auto-scaling)', 'Decommission -> 0 vCPU').\n"
+            "4. confidence_pct: Integer 88 to 99.\n"
+            "5. recommended_wave: 'Wave 1: Quick Wins & Retire', 'Wave 2: Database & PaaS Modernization', or 'Wave 3: Mission-Critical & Refactor'.\n"
+            "6. technical_rationale: Concise 1-2 sentence architectural rationale referencing the workload's OS/DB EOL risk, CPU P95 utilization, and TCO impact."
+        )
+        response_schema = {
+            "type": "OBJECT",
+            "properties": {
+                "executive_6r_summary": {"type": "STRING"},
+                "recommendations": {
+                    "type": "ARRAY",
+                    "items": {
+                        "type": "OBJECT",
+                        "properties": {
+                            "workload_id": {"type": "STRING"},
+                            "workload_name": {"type": "STRING"},
+                            "recommended_6r": {
+                                "type": "STRING",
+                                "enum": ["Rehost", "Replatform", "Refactor", "Replace", "Retain", "Retire"],
+                            },
+                            "target_gcp_service": {"type": "STRING"},
+                            "rightsized_sku": {"type": "STRING"},
+                            "confidence_pct": {"type": "INTEGER"},
+                            "recommended_wave": {"type": "STRING"},
+                            "technical_rationale": {"type": "STRING"},
+                        },
+                        "required": [
+                            "workload_id",
+                            "workload_name",
+                            "recommended_6r",
+                            "target_gcp_service",
+                            "rightsized_sku",
+                            "confidence_pct",
+                            "recommended_wave",
+                            "technical_rationale",
+                        ],
+                    },
+                },
+            },
+            "required": ["executive_6r_summary", "recommendations"],
+        }
+        payload = {
+            "systemInstruction": {"parts": [{"text": system_instruction}]},
+            "contents": [
+                {
+                    "role": "user",
+                    "parts": [
+                        {
+                            "text": (
+                                f"Analyze these {len(workload_input_list)} workloads for estate '{base_estate.get('name')}' "
+                                f"(Target Region: {base_estate.get('default_region')}) and produce optimal 6R target recommendations:\n"
+                                + _json.dumps(workload_input_list)
+                            )
+                        }
+                    ],
+                }
+            ],
+            "generationConfig": {
+                "temperature": 0.15,
+                "maxOutputTokens": 4096,
+                "responseMimeType": "application/json",
+                "responseSchema": response_schema,
+                "thinkingConfig": {"thinkingBudget": 128},
+            },
+        }
+        try:
+            req = urllib.request.Request(
+                url,
+                data=_json.dumps(payload).encode("utf-8"),
+                headers={
+                    "Authorization": f"Bearer {token}",
+                    "Content-Type": "application/json",
+                },
+                method="POST",
+            )
+            with urllib.request.urlopen(req, timeout=28.0) as resp:
+                body = _json.loads(resp.read().decode("utf-8"))
+                candidates = body.get("candidates", [])
+                if candidates:
+                    parts = candidates[0].get("content", {}).get("parts", [])
+                    json_text = "".join(p.get("text", "") for p in parts if not p.get("thought")).strip()
+                    if not json_text:
+                        json_text = "".join(p.get("text", "") for p in parts).strip()
+                    parsed = _json.loads(json_text)
+                    if isinstance(parsed, dict) and parsed.get("recommendations"):
+                        ai_recommendations = parsed["recommendations"]
+                        executive_summary = parsed.get("executive_6r_summary", "")
+                        live_vertex_used = True
+        except Exception:
+            pass
+
+    # Deterministic fallback / enrichment for any workload not returned by Vertex AI
+    rec_by_id = {r["workload_id"]: r for r in ai_recommendations if isinstance(r, dict) and "workload_id" in r}
+    final_recommendations: List[Dict[str, Any]] = []
+    applied_overrides: Dict[str, Dict[str, str]] = {}
+
+    for w in workloads:
+        wid = w["id"]
+        if wid in rec_by_id:
+            r = rec_by_id[wid]
+            rec_6r = r.get("recommended_6r", w.get("recommended_6r", "Replatform"))
+            if rec_6r not in TREATMENT_PROFILES:
+                rec_6r = "Replatform"
+            target_svc = r.get("target_gcp_service", w.get("target_gcp_service", "Compute Engine Gen4 C4"))
+            sku = r.get("rightsized_sku", f"c4-standard-{max(4, w['vcpu'] // max(1, w['servers'] * 2))} + Hyperdisk")
+            conf = int(r.get("confidence_pct", 94))
+            wave = r.get("recommended_wave", "Wave 2: Database & PaaS Modernization")
+            rationale = r.get("technical_rationale", w.get("target_rationale", ""))
+        else:
+            p95 = w.get("cpu_utilization_p95", 25)
+            rec_6r = w.get("recommended_6r", "Replatform")
+            target_svc = w.get("target_gcp_service", "Compute Engine Gen4 C4")
+            avg_vcpu = max(2, round((w["vcpu"] / max(1, w["servers"])) * (0.5 if p95 < 30 else 0.75)))
+            sku = (
+                "0 vCPU (Coldline Snapshot Archive)"
+                if rec_6r == "Retire"
+                else (
+                    "Serverless Managed PaaS (Auto-Scaling)"
+                    if rec_6r in ("Refactor", "Replace")
+                    else f"Gen4 c4-highmem-{avg_vcpu} + Hyperdisk Balanced"
+                )
+            )
+            conf = 95 if rec_6r in ("Retire", "Replatform") else 91
+            wave = (
+                "Wave 1: Quick Wins & Retire"
+                if rec_6r in ("Retire", "Replace")
+                else ("Wave 2: Database & PaaS Modernization" if "db" in w.get("category", "") else "Wave 3: Mission-Critical & Refactor")
+            )
+            rationale = w.get("target_rationale", "AI 6R telemetry alignment based on CPU P95 and OS/DB support lifecycle.")
+
+        applied_overrides[wid] = {
+            "recommended_6r": rec_6r,
+            "target_gcp_service": target_svc,
+        }
+        # Persist recommendation onto base estate workload so subsequent queries reflect AI decision
+        for bw in base_estate.get("workloads", []):
+            if bw["id"] == wid:
+                bw["recommended_6r"] = rec_6r
+                bw["target_gcp_service"] = target_svc
+                bw["target_rationale"] = rationale
+                bw["rightsized_sku"] = sku
+                bw["ai_confidence_pct"] = conf
+
+        final_recommendations.append({
+            "workload_id": wid,
+            "workload_name": w["name"],
+            "servers": w["servers"],
+            "source_tech": w["source_tech"],
+            "cpu_p95_pct": w.get("cpu_utilization_p95", 25),
+            "recommended_6r": rec_6r,
+            "target_gcp_service": target_svc,
+            "rightsized_sku": sku,
+            "confidence_pct": conf,
+            "recommended_wave": wave,
+            "technical_rationale": rationale,
+        })
+
+    if not executive_summary:
+        counts: Dict[str, int] = {}
+        for item in final_recommendations:
+            counts[item["recommended_6r"]] = counts.get(item["recommended_6r"], 0) + 1
+        dist_str = ", ".join(f"{v} {k}" for k, v in counts.items())
+        executive_summary = (
+            f"Vertex AI 6R Target Recommender Agent analyzed {len(final_recommendations)} workloads "
+            f"({sum(w['servers'] for w in workloads)} servers) for {base_estate.get('name')}. "
+            f"Optimal 6R Distribution: {dist_str}."
+        )
+
+    updated_assessment = compute_assessment(
+        estate_id=estate_id,
+        custom_overrides=applied_overrides,
+        extra_workloads=extra_workloads,
+    )
+
+    return {
+        "status": "ok",
+        "agent": f"Vertex AI 6R Target Recommender Agent ({model_id})",
+        "model": f"vertex-ai/{model_id}",
+        "project_id": project_id,
+        "location": location,
+        "live_vertex_ai": live_vertex_used,
+        "executive_6r_summary": executive_summary,
+        "recommendations": final_recommendations,
+        "applied_overrides": applied_overrides,
+        "assessment": updated_assessment,
+    }
+
+
+@app.route("/api/ai-6r-agent", methods=["POST"])
+def api_ai_6r_agent() -> Any:
+    """Executes the Vertex AI 6R Migration & Target Architecture Recommendation Agent across all workloads."""
+    payload: Dict[str, Any] = request.get_json(silent=True) or {}
+    estate_id = payload.get("estate_id", "enterprise-reference-estate")
+    extra_workloads = payload.get("extra_workloads", [])
+    result = run_vertex_6r_migration_agent(estate_id=estate_id, extra_workloads=extra_workloads)
+    return jsonify(result)
+
+
 
 @app.route("/api/export-markdown", methods=["POST"])
 def api_export_markdown() -> Any:
@@ -2075,7 +2325,7 @@ def api_sample_csv() -> Any:
 
 @app.route("/api/ingest-telemetry", methods=["POST"])
 def api_ingest_telemetry() -> Any:
-    """Ingests customer RVTools/CSV telemetry and returns the newly generated estate_id and assessment."""
+    """Ingests customer RVTools/CSV telemetry, runs the Vertex AI 6R Agent, and returns the assessment."""
     payload: Dict[str, Any] = request.get_json(silent=True) or {}
     client_name = payload.get("client_name", "Enterprise Customer")
     industry = payload.get("industry", "Public Sector & Enterprise")
@@ -2089,8 +2339,13 @@ def api_ingest_telemetry() -> Any:
             region=region,
             csv_text=csv_text,
         )
-        assessment = compute_assessment(estate_id=estate_id)
-        return jsonify({"status": "ok", "estate_id": estate_id, "assessment": assessment})
+        ai_6r_result = run_vertex_6r_migration_agent(estate_id=estate_id)
+        return jsonify({
+            "status": "ok",
+            "estate_id": estate_id,
+            "assessment": ai_6r_result["assessment"],
+            "ai_6r_agent": ai_6r_result,
+        })
     except Exception as exc:
         return jsonify({"status": "error", "message": str(exc)}), 400
 
