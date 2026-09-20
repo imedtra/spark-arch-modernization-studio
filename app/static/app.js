@@ -1291,84 +1291,53 @@ function getBadgeColor(strategy) {
 }
 
 /* ============================================================================
- * Interactive Background Color Customizer (Default: Pure White #ffffff)
+ * White / Black Background Toggle (Strictly #ffffff or #000000)
  * ========================================================================== */
 function initBackgroundCustomizer() {
-  const picker = document.getElementById('bg-color-picker');
   const swatches = document.querySelectorAll('.bg-swatch-btn');
-  const savedColor = localStorage.getItem('spark_bg_color') || '#ffffff';
+  const rawSaved = (localStorage.getItem('spark_bg_color') || '#ffffff').toLowerCase();
+  const savedColor = rawSaved === '#000000' || rawSaved === '#090d14' ? '#000000' : '#ffffff';
 
   applyCustomBackgroundColor(savedColor);
-  if (picker) picker.value = savedColor;
 
   swatches.forEach((btn) => {
-    const color = btn.getAttribute('data-bgcolor');
-    if (color && color.toLowerCase() === savedColor.toLowerCase()) {
-      swatches.forEach((b) => b.classList.remove('active'));
-      btn.classList.add('active');
-    }
+    const color = (btn.getAttribute('data-bgcolor') || '').toLowerCase();
+    btn.classList.toggle('active', color === savedColor);
     btn.addEventListener('click', () => {
-      const targetColor = btn.getAttribute('data-bgcolor');
+      const targetColor = btn.getAttribute('data-bgcolor') === '#000000' ? '#000000' : '#ffffff';
       swatches.forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
-      if (picker) picker.value = targetColor;
       applyCustomBackgroundColor(targetColor);
     });
   });
-
-  if (picker) {
-    picker.addEventListener('input', (e) => {
-      const chosen = e.target.value;
-      swatches.forEach((b) => b.classList.remove('active'));
-      applyCustomBackgroundColor(chosen);
-    });
-  }
 }
 
 function applyCustomBackgroundColor(hexColor) {
-  if (!hexColor) return;
-  localStorage.setItem('spark_bg_color', hexColor);
+  const normalized = hexColor === '#000000' ? '#000000' : '#ffffff';
+  localStorage.setItem('spark_bg_color', normalized);
   const root = document.documentElement;
 
-  const clean = hexColor.replace('#', '');
-  const r = parseInt(clean.substring(0, 2), 16) || 255;
-  const g = parseInt(clean.substring(2, 4), 16) || 255;
-  const b = parseInt(clean.substring(4, 6), 16) || 255;
-  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-
-  root.style.setProperty('--bg-canvas', hexColor);
-
-  if (luminance > 0.45) {
-    // Light / White Mode Palette
-    const surfaceR = Math.max(0, r - 8);
-    const surfaceG = Math.max(0, g - 6);
-    const surfaceB = Math.max(0, b - 4);
-    const elevR = Math.max(0, r - 16);
-    const elevG = Math.max(0, g - 13);
-    const elevB = Math.max(0, b - 9);
-    root.style.setProperty('--bg-surface', `rgb(${surfaceR}, ${surfaceG}, ${surfaceB})`);
-    root.style.setProperty('--bg-elevated', `rgb(${elevR}, ${elevG}, ${elevB})`);
-    root.style.setProperty('--bg-hover', `rgba(15, 23, 42, 0.06)`);
-    root.style.setProperty('--header-bg', `rgba(${r}, ${g}, ${b}, 0.95)`);
-    root.style.setProperty('--border-subtle', 'rgba(15, 23, 42, 0.10)');
-    root.style.setProperty('--border-strong', 'rgba(15, 23, 42, 0.20)');
+  if (normalized === '#ffffff') {
+    // White Background Theme
+    root.style.setProperty('--bg-canvas', '#ffffff');
+    root.style.setProperty('--bg-surface', '#f8fafc');
+    root.style.setProperty('--bg-elevated', '#f1f5f9');
+    root.style.setProperty('--bg-hover', 'rgba(15, 23, 42, 0.06)');
+    root.style.setProperty('--header-bg', 'rgba(255, 255, 255, 0.96)');
+    root.style.setProperty('--border-subtle', '#e2e8f0');
+    root.style.setProperty('--border-strong', '#cbd5e1');
     root.style.setProperty('--text-primary', '#0f172a');
     root.style.setProperty('--text-secondary', '#334155');
     root.style.setProperty('--text-muted', '#64748b');
   } else {
-    // Dark Mode Palette
-    const surfaceR = Math.min(255, r + 10);
-    const surfaceG = Math.min(255, g + 14);
-    const surfaceB = Math.min(255, b + 20);
-    const elevR = Math.min(255, r + 18);
-    const elevG = Math.min(255, g + 25);
-    const elevB = Math.min(255, b + 36);
-    root.style.setProperty('--bg-surface', `rgb(${surfaceR}, ${surfaceG}, ${surfaceB})`);
-    root.style.setProperty('--bg-elevated', `rgb(${elevR}, ${elevG}, ${elevB})`);
-    root.style.setProperty('--bg-hover', `rgba(255, 255, 255, 0.08)`);
-    root.style.setProperty('--header-bg', `rgba(${r}, ${g}, ${b}, 0.95)`);
-    root.style.setProperty('--border-subtle', 'rgba(255, 255, 255, 0.09)');
-    root.style.setProperty('--border-strong', 'rgba(255, 255, 255, 0.18)');
+    // Black Background Theme
+    root.style.setProperty('--bg-canvas', '#000000');
+    root.style.setProperty('--bg-surface', '#0c111d');
+    root.style.setProperty('--bg-elevated', '#161f30');
+    root.style.setProperty('--bg-hover', 'rgba(255, 255, 255, 0.08)');
+    root.style.setProperty('--header-bg', 'rgba(0, 0, 0, 0.96)');
+    root.style.setProperty('--border-subtle', 'rgba(255, 255, 255, 0.12)');
+    root.style.setProperty('--border-strong', 'rgba(255, 255, 255, 0.22)');
     root.style.setProperty('--text-primary', '#f8fafc');
     root.style.setProperty('--text-secondary', '#cbd5e1');
     root.style.setProperty('--text-muted', '#94a3b8');
