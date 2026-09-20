@@ -1,0 +1,9 @@
+# Copy this file to terraform/terraform.tfvars and fill in your values
+project_id     = "my-gcp-project-id"
+region         = "us-central1"
+app_name       = "my-iap-cloud-run-app"
+allowed_domain = "google.com"
+domain_name    = "myapp.example.com"
+# Provide support_email. Terraform will automatically create the IAP OAuth Brand & OAuth Client for you!
+support_email = "admin@example.com"
+

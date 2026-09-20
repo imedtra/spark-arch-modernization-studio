@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SPARK Architecture Modernization Studio — Rapid Insights</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <!-- Sticky Executive Top Navigation -->
+  <header class="app-header">
+    <div class="brand-cluster">
+      <div class="brand-logo" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#06b6d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2 17L12 22L22 17" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2 12L12 17L22 12" stroke="#06b6d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-title">
+          SPARK Architecture Modernization Studio
+          <span class="badge-pill">Rapid Insights Engine</span>
+        </div>
+        <div class="brand-subtitle">Google Cloud EMEA OCE • Automated Discovery, 6R Strategy & Financial Scenario Modeling</div>
+      </div>
+    </div>
+
+    <div class="header-controls">
+      <!-- Interactive Background Color Customizer -->
+      <div class="bg-customizer-group" title="Customize Website Background Color">
+        <span class="bg-customizer-label">&#127912; Background:</span>
+        <button type="button" class="bg-swatch-btn active" data-bgcolor="#ffffff" style="background:#ffffff;" title="Pure White (#ffffff — Default)"></button>
+        <button type="button" class="bg-swatch-btn" data-bgcolor="#f8fafc" style="background:#f8fafc;" title="Soft Slate (#f8fafc)"></button>
+        <button type="button" class="bg-swatch-btn" data-bgcolor="#fdfbf7" style="background:#fdfbf7;" title="Warm Ivory (#fdfbf7)"></button>
+        <button type="button" class="bg-swatch-btn" data-bgcolor="#f0f9ff" style="background:#f0f9ff;" title="Ice Sky Blue (#f0f9ff)"></button>
+        <button type="button" class="bg-swatch-btn" data-bgcolor="#f0fdf4" style="background:#f0fdf4;" title="Mint Cloud (#f0fdf4)"></button>
+        <button type="button" class="bg-swatch-btn" data-bgcolor="#090d14" style="background:#090d14;" title="Midnight Dark (#090d14)"></button>
+        <input type="color" id="bg-color-picker" class="bg-color-picker-input" value="#ffffff" title="Pick Any Custom Background Color">
+      </div>
+
+      <button id="btn-ingest-data" class="btn btn-secondary" title="Open Discovery File Upload Modal">
+        &#128229; Quick Upload Modal
+      </button>
+      <button id="btn-add-workload" class="btn btn-secondary" title="Add custom discovered server/application">
+        + Add Workload
+      </button>
+      <button id="btn-export-md" class="btn btn-secondary" title="Export 44-Slide Rapid Insights Executive Report">
+        Export Rapid Insights MD
+      </button>
+      <button id="btn-export-tf" class="btn btn-primary" title="Export Google Cloud FastFabric Terraform IaC">
+        Export Terraform HCL
+      </button>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <!-- Interactive Navigation Tabs (Tab 1 = File Upload Landing Page; Tab 2 = Customer Name & Estate Overview) -->
+    <nav class="studio-tabs" role="tablist">
+      <button class="tab-btn active" data-tab="tab-upload" role="tab" aria-selected="true">
+        1. Load Discovery File (Start Here)
+      </button>
+      <button class="tab-btn" data-tab="tab-overview" role="tab" aria-selected="false">
+        2. Customer Estate &amp; Infrastructure Overview
+      </button>
+      <button class="tab-btn" data-tab="tab-domains" role="tab" aria-selected="false">
+        3. Technology Domains, Sprawl &amp; 6R Engine
+      </button>
+      <button class="tab-btn" data-tab="tab-databases" role="tab" aria-selected="false">
+        4. Databases Modernization &amp; Sankey Pathways
+      </button>
+      <button class="tab-btn" data-tab="tab-scenarios" role="tab" aria-selected="false">
+        5. Financial Scenarios &amp; Cost Configurator
+      </button>
+      <button class="tab-btn" data-tab="tab-waves-waf" role="tab" aria-selected="false">
+        6. Dependency Waves, WAF &amp; AI Advisor
+      </button>
+    </nav>
+
+    <!-- ======================================================================= -->
+    <!-- TAB 1 (FIRST PAGE): Dedicated File Upload & Specification View          -->
+    <!-- ======================================================================= -->
+    <section id="tab-upload" class="tab-panel active" role="tabpanel">
+      <div style="max-width: 920px; margin: 1.5rem auto;">
+        <div class="card-panel" style="padding: 2.25rem; border: 2px solid var(--border-strong);">
+          <div style="text-align: center; margin-bottom: 1.75rem;">
+            <span class="badge-pill" style="font-size: 0.8rem; padding: 0.35rem 0.85rem;">Step 1 • Automated Infrastructure Discovery Ingestion</span>
+            <h1 style="font-size: 1.65rem; font-weight: 700; color: var(--text-primary); margin-top: 0.75rem; margin-bottom: 0.5rem;">
+              Please Load Your Infrastructure Discovery File to Begin
+            </h1>
+            <p style="font-size: 0.95rem; color: var(--text-secondary); max-width: 720px; margin: 0 auto;">
+              Upload a discovery export file below to automatically analyze OS End-of-Support exposure, detect Zombie VMs (&lt;5% CPU), calculate compute right-sizing, and generate your customer's modernization report on <strong>Tab 2</strong>.
+            </p>
+          </div>
+
+          <!-- Clear Specification of Required File Type & Schema -->
+          <div style="background: var(--bg-elevated); border: 1px solid var(--border-strong); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1.5rem;">
+            <div style="font-weight: 700; font-size: 0.9rem; color: var(--accent-blue); margin-bottom: 0.5rem;">
+              &#128196; Required File Type &amp; Format Specifications:
+            </div>
+            <ul style="font-size: 0.84rem; color: var(--text-secondary); padding-left: 1.25rem; line-height: 1.65; margin-bottom: 0.75rem;">
+              <li><strong>Required File Format:</strong> <code>.CSV</code> (Comma-Separated Values) or <code>.TXT</code> (UTF-8 encoded, up to <code>10 MB</code>).</li>
+              <li><strong>Supported Discovery Tools:</strong>
+                <strong>VMware RVTools</strong> (<code>vInfo</code> / <code>vCPU</code> export),
+                <strong>Google Cloud Migration Center</strong> (Server Asset CSV),
+                <strong>DrMigrate</strong>, or standard server inventory spreadsheets.
+              </li>
+              <li><strong>Required CSV Columns:</strong>
+                <code style="font-family: var(--font-mono); font-size: 0.78rem; background: var(--bg-canvas); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border-subtle);">
+                  VM_Name, Application, OS_Version, vCPU, Memory_GB, Storage_TB, CPU_P95_Pct, Environment, Database_Engine, Software_Stack, Annual_Cost_USD
+                </code>
+              </li>
+            </ul>
+            <div style="display: flex; gap: 0.65rem; flex-wrap: wrap;">
+              <button type="button" id="page1-btn-download-template" class="btn btn-secondary" style="font-size: 0.78rem;">
+                &#11015; Download Required .CSV Template
+              </button>
+              <button type="button" id="page1-btn-load-sample" class="btn btn-secondary" style="font-size: 0.78rem;">
+                &#9889; Load Sample Discovery File (12 Enterprise VMs)
+              </button>
+            </div>
+          </div>
+
+          <!-- Drag & Drop / File Picker Box -->
+          <div id="page1-dropzone" style="border: 2px dashed var(--accent-blue); border-radius: var(--radius-md); padding: 2rem; text-align: center; background: var(--bg-canvas); margin-bottom: 1.5rem; cursor: pointer; transition: background 0.15s ease;">
+            <div style="font-size: 2.2rem; margin-bottom: 0.5rem;">&#128193;</div>
+            <div style="font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.35rem;">
+              Click to Select a <code>.CSV</code> or <code>.TXT</code> Discovery File, or Drag &amp; Drop Here
+            </div>
+            <div id="page1-file-status" style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.9rem;">
+              No file loaded yet — select a local <code>.csv</code> / <code>.txt</code> export or click "Load Sample Discovery File" above.
+            </div>
+            <label class="btn btn-primary" style="cursor: pointer; display: inline-block; padding: 0.55rem 1.25rem; font-size: 0.88rem;">
+              Browse &amp; Load Discovery File (.CSV / .TXT)
+              <input type="file" id="page1-file-input" accept=".csv,.txt" style="display: none;">
+            </label>
+          </div>
+
+          <!-- Target Region & Customer Metadata for the Uploaded File -->
+          <div class="form-row" style="margin-bottom: 1rem;">
+            <div class="form-field">
+              <label for="page1-client-name">Customer / Organization Name (Displayed on Tab 2)</label>
+              <input type="text" id="page1-client-name" placeholder="Enter Customer Organization Name..." value="Enterprise Client Assessment" class="form-input">
+            </div>
+            <div class="form-field">
+              <label for="page1-industry">Industry Sector</label>
+              <input type="text" id="page1-industry" value="Enterprise &amp; Public Sector" class="form-input">
+            </div>
+            <div class="form-field">
+              <label for="page1-region">Target Google Cloud Region</label>
+              <select id="page1-region" class="select-input">
+                <option value="me-central1 (Doha, Qatar)" selected>me-central1 (Doha, Qatar — Sovereign)</option>
+                <option value="europe-west1 (Belgium)">europe-west1 (Belgium, EU)</option>
+                <option value="europe-west3 (Frankfurt, Germany)">europe-west3 (Frankfurt, Germany)</option>
+                <option value="europe-west2 (London, UK)">europe-west2 (London, UK)</option>
+                <option value="us-central1 (Iowa, USA)">us-central1 (Iowa, USA)</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 1.25rem;">
+            <label for="page1-csv-text" style="display:block; font-size:0.78rem; font-weight:600; color:var(--text-secondary); margin-bottom:0.4rem;">
+              Loaded Discovery File Content Preview (Editable CSV Telemetry):
+            </label>
+            <textarea id="page1-csv-text" rows="7" class="code-preview" placeholder="Paste or load a .CSV file with columns: VM_Name,Application,OS_Version,vCPU,Memory_GB,Storage_TB,CPU_P95_Pct,Environment,Database_Engine,Software_Stack,Annual_Cost_USD" style="width:100%; font-family:var(--font-mono); font-size:0.76rem; resize:vertical;"></textarea>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 0.75rem; align-items: center;">
+            <button type="button" id="page1-btn-skip-to-tab2" class="btn btn-secondary" style="font-size: 0.85rem;">
+              View Pre-Loaded Reference Estates on Tab 2 &rarr;
+            </button>
+            <button type="button" id="page1-btn-submit-upload" class="btn btn-primary" style="padding: 0.65rem 1.5rem; font-size: 0.92rem; font-weight: 700;">
+              &#128640; Analyze Loaded File &amp; Open Customer Report (Tab 2) &rarr;
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- TAB 2: Customer Name Banner, KPIs & Estate Overview (Slide 3 & 7-9)     -->
+    <!-- ======================================================================= -->
+    <section id="tab-overview" class="tab-panel" role="tabpanel">
+      <!-- Relocated Customer Selector & Customer Name Banner (Moved from Page 1 to Tab 2) -->
+      <div class="card-panel" style="margin-bottom: 1rem; padding: 0.85rem 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+        <div class="selector-group" style="display: flex; align-items: center; gap: 0.65rem;">
+          <label for="estate-select" class="selector-label" style="font-weight: 700; color: var(--text-primary);">Active Customer Estate:</label>
+          <select id="estate-select" class="select-input">
+            <option value="enterprise-reference-estate">Enterprise Reference Estate (538 Servers / 110 Applications)</option>
+            <option value="cymbal-retail-hybrid">Cymbal Global Retail &amp; E-Commerce (48 Servers / VMware + AWS)</option>
+          </select>
+        </div>
+        <span class="meta-chip" style="color: var(--accent-blue);">Customer Profile &amp; Assessment Scope (Tab 2)</span>
+      </div>
+
+      <!-- Executive Customer Summary Banner (Now on Tab 2) -->
+      <section class="estate-banner" id="estate-banner" style="margin-bottom: 1.25rem;">
+        <div class="estate-banner-left">
+          <div style="display:flex; align-items:center; gap:0.65rem;">
+            <h1 id="estate-name" class="estate-title">Customer Estate Overview</h1>
+            <span id="estate-date" class="meta-chip" style="color:#06b6d4; border-color:rgba(6,182,212,0.3);">Prepared: August 05, 2026</span>
+          </div>
+          <p id="estate-desc" class="estate-description">Loading Rapid Insights telemetry...</p>
+        </div>
+        <div class="estate-meta-tags">
+          <span class="meta-chip" id="estate-env">Environment: VMware vSphere / GCVE Hybrid</span>
+          <span class="meta-chip" id="estate-region">Target Region: me-central1 (Doha)</span>
+          <span class="meta-chip" id="estate-compliance">Compliance: Qatar NIA, ISO 27001</span>
+        </div>
+      </section>
+
+      <!-- 4 Executive KPI Cards (Now on Tab 2) -->
+      <section class="kpi-grid" aria-label="Executive Assessment Metrics" style="margin-bottom: 1.5rem;">
+        <article class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-title">DISCOVERED ESTATE FOOTPRINT</span>
+            <span class="kpi-tag">99% App Mapped</span>
+          </div>
+          <div class="kpi-value" id="kpi-footprint">538 Virtual Servers</div>
+          <div class="kpi-subtext" id="kpi-footprint-sub">110 Applications • 3,625 Cores • 11.0 TB RAM • 595.9 TB Storage</div>
+        </article>
+
+        <article class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-title">OPTIMIZED ANNUAL RUN-RATE</span>
+            <span class="kpi-tag emerald" id="kpi-savings-pct">-70.9% TCO Reduction</span>
+          </div>
+          <div class="kpi-value emerald-text" id="kpi-target-cost">$931,466 / yr</div>
+          <div class="kpi-subtext" id="kpi-cost-sub">Down from $3,200,000/yr As-Is Baseline ($2.27M/yr Savings)</div>
+        </article>
+
+        <article class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-title">RIGHT-SIZING &amp; ZOMBIE WATCHLIST</span>
+            <span class="kpi-tag amber" id="kpi-zombie-tag">54 Zombie VMs (&lt;5% CPU)</span>
+          </div>
+          <div class="kpi-value cyan-text" id="kpi-rightsize">374 Over-provisioned</div>
+          <div class="kpi-subtext" id="kpi-rightsize-sub">70% VMs &lt;30% CPU • Cores -68% (3,625 &rarr; 1,150) • RAM -80%</div>
+        </article>
+
+        <article class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-title">OS LIFECYCLE &amp; WAF POSTURE</span>
+            <span class="kpi-tag rose" id="kpi-eos-tag">292 EOS OS Servers (54%)</span>
+          </div>
+          <div class="kpi-value" id="kpi-waf-score">68% WAF Score</div>
+          <div class="kpi-subtext" id="kpi-waf-sub">36 EOL Tech Products • 100 Gbps GCVE-GCE Shared VPC Ready</div>
+        </article>
+      </section>
+
+      <div class="panel-header">
+        <div>
+          <h2 class="section-title">Rapid Insights Estate Overview (Slide 3 Executive Deck)</h2>
+          <p class="section-subtitle">Comprehensive 4-pillar summary across Servers &amp; Apps, Resource Utilization, Technology Lifecycle Risk, and Modernization Opportunities.</p>
+        </div>
+        <span class="meta-chip" id="overview-scope-badge">538 Virtual Servers • 100% Powered On</span>
+      </div>
+
+      <!-- 4-Column Executive Overview Card Grid -->
+      <div class="overview-4col-grid" id="overview-4col-grid">
+        <!-- Populated dynamically by app.js -->
+      </div>
+
+      <!-- Resource Optimization Before vs. After (Slide 9) -->
+      <div class="tco-comparison-grid" style="margin-top:1.5rem;">
+        <div class="card-panel">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+            <h3 class="panel-title" style="margin:0;">Infrastructure Right-Sizing: Before vs. After Optimization (Slide 9)</h3>
+            <span class="badge-6r badge-emerald" id="opt-savings-badge">85% Rehost Optimization Savings</span>
+          </div>
+          <p class="section-subtitle" style="margin-bottom:1rem;">
+            Right-sizing 374 over-provisioned servers (&lt;30% CPU) and retiring 54 zombie servers (&lt;5% CPU) dramatically compresses compute and memory footprints while upgrading storage to 100% Google Cloud Hyperdisk.
+          </p>
+          <div id="resource-opt-bars">
+            <!-- Populated by app.js -->
+          </div>
+        </div>
+
+        <div class="card-panel">
+          <h3 class="panel-title">Operating System Support Lifecycle Timeline (Slide 7–8)</h3>
+          <p class="section-subtitle" style="margin-bottom:0.85rem;">
+            44 distinct OS versions discovered. <strong>292 servers (54%)</strong> run Out-of-Support or near-EOL operating systems requiring automated M4CE OS upgrade or Cloud SQL/GKE replatforming.
+          </p>
+          <div class="table-wrapper" style="max-height:255px; overflow-y:auto;">
+            <table class="studio-table">
+              <thead>
+                <tr>
+                  <th>Operating System Version</th>
+                  <th>Server Count</th>
+                  <th>Support Status</th>
+                  <th>End of Support Date</th>
+                </tr>
+              </thead>
+              <tbody id="os-versions-tbody">
+                <!-- Populated by app.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Network Dependency & Firewall Port Inspection (Slide 42) -->
+      <div class="card-panel" style="margin-top:1.5rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+          <div>
+            <h3 class="panel-title" style="margin:0;">Network Telemetry &amp; East-West Connection Inspector (Slide 42)</h3>
+            <p class="section-subtitle">Discovered TCP/UDP process flows, cross-wave latency dependencies, and internet-exposed jump hosts requiring Identity-Aware Proxy (IAP).</p>
+          </div>
+          <span class="meta-chip">100 Gbps GCVE &harr; GCE Native Shared VPC</span>
+        </div>
+        <div class="table-wrapper">
+          <table class="studio-table">
+            <thead>
+              <tr>
+                <th>Source Server / Workload</th>
+                <th>Source IP</th>
+                <th>Destination Workload</th>
+                <th>Destination IP</th>
+                <th>Port / Protocol</th>
+                <th>Active Process</th>
+                <th>Architectural Risk &amp; Remediation</th>
+              </tr>
+            </thead>
+            <tbody id="network-connections-tbody">
+              <!-- Populated by app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- TAB 2: Technology Domains (Slide 11-20) & 6R Treatment Table            -->
+    <!-- ======================================================================= -->
+    <section id="tab-domains" class="tab-panel" role="tabpanel">
+      <div class="panel-header">
+        <div>
+          <h2 class="section-title">Pattern Recognition &amp; Technology Sprawl Consolidation (Slide 11–20)</h2>
+          <p class="section-subtitle">95 unique software products discovered across 696 installations in 5 technology domains, with AI-prescribed Google Cloud consolidation targets.</p>
+        </div>
+        <div class="treatment-pills-summary" id="treatment-summary-bar"></div>
+      </div>
+
+      <!-- 5 Technology Domain Cards -->
+      <div class="domains-grid" id="tech-domains-grid">
+        <!-- Populated by app.js -->
+      </div>
+
+      <!-- Interactive Application Portfolio & 6R Precision Table -->
+      <div class="card-panel" style="margin-top:1.5rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.85rem;">
+          <div>
+            <h3 class="panel-title" style="margin:0;">Workload Portfolio &amp; Interactive 6R Treatment Engine</h3>
+            <p class="section-subtitle">Click any workload name to launch the <strong>Slide 5 Per-Application Deep-Dive Modal</strong>, or override its 6R strategy below to recalculate live TCO.</p>
+          </div>
+          <span class="meta-chip" style="color:#10b981;">Click Application Name for Slide 5 Deep-Dive</span>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="studio-table">
+            <thead>
+              <tr>
+                <th>Application / Workload Group</th>
+                <th>Source Stack &amp; OS</th>
+                <th>Footprint</th>
+                <th>P95 CPU &amp; EOL Risk</th>
+                <th>6R Strategy (Interactive)</th>
+                <th>Target Google Cloud Service</th>
+                <th>Target Run-Rate &amp; Savings</th>
+              </tr>
+            </thead>
+            <tbody id="workload-tbody">
+              <!-- Populated by app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- TAB 3: Databases Modernization Deep-Dive & Sankey Pathways (Slide 21-27)-->
+    <!-- ======================================================================= -->
+    <section id="tab-databases" class="tab-panel" role="tabpanel">
+      <div class="panel-header">
+        <div>
+          <h2 class="section-title">Database Estate Modernization &amp; Sankey Pathways (Slide 21–27)</h2>
+          <p class="section-subtitle">58 database servers discovered across 5 RDBMS engines (SQL Server, MySQL, PostgreSQL, IBM DB2, Oracle 19c). Inspect version support risk and AI conversion pathways to Cloud SQL and AlloyDB.</p>
+        </div>
+        <span class="badge-6r badge-cyan">Database Migration Service (DMS) + AI Schema Conversion</span>
+      </div>
+
+      <!-- Per-Engine Sankey Pathway Cards -->
+      <div class="db-engine-grid" id="db-engine-grid">
+        <!-- Populated by app.js -->
+      </div>
+
+      <!-- Database Cost Breakdown Matrix Table (Slide 27) -->
+      <div class="card-panel" style="margin-top:1.5rem;">
+        <h3 class="panel-title">Database Target Cost Breakdown Matrix by Engine (Slide 27)</h3>
+        <p class="section-subtitle" style="margin-bottom:0.85rem;">
+          Detailed annual Google Cloud run-rate breakdown across Compute, Hyperdisk Storage, and Software Assurance BYOL / License Mobility.
+        </p>
+        <div class="table-wrapper">
+          <table class="studio-table">
+            <thead>
+              <tr>
+                <th>Database Engine</th>
+                <th>Discovered Servers</th>
+                <th>Out-of-Support (EOL)</th>
+                <th>Annual Compute ($)</th>
+                <th>Hyperdisk Storage ($)</th>
+                <th>Licensing / BYOL SA ($)</th>
+                <th>Total Annual Run-Rate ($)</th>
+              </tr>
+            </thead>
+            <tbody id="db-cost-matrix-tbody">
+              <!-- Populated by app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- TAB 4: Interactive Cost Configurator & Scenario Comparison (Slide 28-35)-->
+    <!-- ======================================================================= -->
+    <section id="tab-scenarios" class="tab-panel" role="tabpanel">
+      <div class="panel-header">
+        <div>
+          <h2 class="section-title">Interactive Cost Model Configuration &amp; Scenario Comparison (Slide 28–35)</h2>
+          <p class="section-subtitle">Adjust commercial cloud levers (3-Year CUDs, Non-Prod 175 hrs/mo weekday scheduling, and Microsoft Oct-2019 Software Assurance BYOL) to compare Scenario 1 vs. Scenario 2 live.</p>
+        </div>
+      </div>
+
+      <!-- Interactive Cost Model Configurator Bar -->
+      <div class="cost-config-bar">
+        <div class="config-control">
+          <label for="cfg-region">Target Google Cloud Region</label>
+          <select id="cfg-region" class="select-input">
+            <option value="me-central1 (Doha, Qatar)">me-central1 (Doha, Qatar — Sovereign)</option>
+            <option value="europe-west3 (Frankfurt, Germany)">europe-west3 (Frankfurt, Germany)</option>
+            <option value="europe-west2 (London, UK)">europe-west2 (London, UK)</option>
+            <option value="us-central1 (Iowa, USA)">us-central1 (Iowa, USA)</option>
+          </select>
+        </div>
+
+        <div class="config-control">
+          <label for="cfg-prod-payment">Production Compute Pricing Model</label>
+          <select id="cfg-prod-payment" class="select-input">
+            <option value="3_year_cud" selected>3-Year Committed Use Discount (CUD -35%)</option>
+            <option value="1_year_cud">1-Year Committed Use Discount (CUD -20%)</option>
+            <option value="payg">On-Demand Pay-As-You-Go (PAYG)</option>
+          </select>
+        </div>
+
+        <div class="config-control">
+          <label for="cfg-nonprod-hours">
+            Non-Production Monthly Schedule: <strong id="cfg-hours-label" style="color:#06b6d4;">175 hrs/mo (Weekday 9–5)</strong>
+          </label>
+          <input type="range" id="cfg-nonprod-hours" min="175" max="730" step="15" value="175" style="accent-color:#06b6d4; cursor:pointer;">
+          <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:#64748b;">
+            <span>175 hrs (76% savings)</span>
+            <span>365 hrs (50%)</span>
+            <span>730 hrs (24/7)</span>
+          </div>
+        </div>
+
+        <div class="config-control">
+          <label for="cfg-byol-toggle">Microsoft Licensing (Oct-2019 Rules)</label>
+          <div style="display:flex; align-items:center; gap:0.55rem; margin-top:0.25rem;">
+            <input type="checkbox" id="cfg-byol-toggle" checked style="width:18px; height:18px; accent-color:#10b981; cursor:pointer;">
+            <span style="font-size:0.82rem; font-weight:600; color:var(--text-primary);">Apply SQL Server SA &amp; Sole-Tenant BYOL</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Side-by-Side Scenario 1 (Rehost All) vs Scenario 2 (Selective Modernization) -->
+      <div class="scenario-comparison-grid" id="scenario-comparison-grid">
+        <!-- Populated by app.js -->
+      </div>
+
+      <!-- Microsoft Oct-2019 Licensing Rules & Why Google Cloud Explainer (Slide 33 & Slide 39) -->
+      <div class="tco-comparison-grid" style="margin-top:1.5rem;">
+        <div class="card-panel">
+          <h3 class="panel-title">Microsoft Oct-2019 Licensing Rules on Google Cloud (Slide 33)</h3>
+          <ul class="fin-list">
+            <li>
+              <span><strong>SQL Server License Mobility (43 VMs):</strong> Active Software Assurance (SA) allows 100% BYOL mobility to Google Compute Engine or Cloud SQL for SQL Server at $0 Google license fee.</span>
+              <strong class="emerald-text">Saves $320K/yr</strong>
+            </li>
+            <li>
+              <span><strong>Windows Server Sole-Tenant BYOL:</strong> Pre-Oct 2019 licenses or active EA enrollments qualify for BYOL on dedicated Google Cloud Sole-Tenant Nodes.</span>
+              <strong>Sole-Tenant Eligible</strong>
+            </li>
+            <li>
+              <span><strong>Windows Server 2008 R2 / 2012 R2 EOS (65 VMs):</strong> Automated in-place OS upgrade to Windows Server 2019/2022 during replication via Migrate for Compute Engine (M4CE).</span>
+              <strong class="cyan-text">Automated Upgrade</strong>
+            </li>
+          </ul>
+        </div>
+
+        <div class="card-panel">
+          <h3 class="panel-title">Why Google Cloud: GCVE + Native GCE Shared VPC (Slide 39)</h3>
+          <ul class="fin-list">
+            <li>
+              <span><strong>100 Gbps East-West Bandwidth:</strong> Dedicated ultra-low-latency interconnect between VMware vSphere on GCVE and native GCE/GKE/BigQuery.</span>
+              <strong class="cyan-text">100 Gbps Fabric</strong>
+            </li>
+            <li>
+              <span><strong>Zero-Hop Shared VPC:</strong> VMware workloads access Cloud SQL, AlloyDB, and Vertex AI natively over private RFC1918 subnets without NAT gateways.</span>
+              <strong class="emerald-text">Zero Egress Penalty</strong>
+            </li>
+            <li>
+              <span><strong>Net Carbon Footprint Impact:</strong> Google Cloud Doha/Frankfurt regions operate with high CFE% and 1.10 PUE, eliminating <strong id="fin-co2-saved">1,110.5 Tons CO2e/yr</strong>.</span>
+              <strong class="emerald-text">-86% CO2e</strong>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- TAB 5: Dependency Waves (Slide 43), WAF Audit & Grounded AI Advisor     -->
+    <!-- ======================================================================= -->
+    <section id="tab-waves-waf" class="tab-panel" role="tabpanel">
+      <div class="panel-header">
+        <div>
+          <h2 class="section-title">Dependency-Aware Execution Waves, WAF Audit &amp; AI Advisor (Slide 43–44)</h2>
+          <p class="section-subtitle">Sequenced migration roadmap, 5-pillar Google Cloud Well-Architected Framework scorecard, and grounded natural-language Q&amp;A advisor.</p>
+        </div>
+      </div>
+
+      <!-- 4 Sequential Waves -->
+      <div class="waves-container" id="waves-container">
+        <!-- Populated by app.js -->
+      </div>
+
+      <!-- Grounded AI Advisor Chat Interface (Slide 44) -->
+      <div class="ai-advisor-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <h3 class="panel-title" style="margin:0; color:#06b6d4;">SPARK Grounded AI Modernization Advisor (Slide 44)</h3>
+            <p class="section-subtitle">Ask natural-language questions about Microsoft BYOL licensing, database consolidation pathways, GCVE vs. GCE networking, or quick-win savings.</p>
+          </div>
+          <span class="badge-pill">Grounded on Active Estate Telemetry</span>
+        </div>
+
+        <div class="ai-prompt-chips">
+          <button class="ai-chip-btn" data-query="How do Microsoft Oct-2019 BYOL and SQL Server Software Assurance rules apply to our 43 SQL Server VMs?">
+            Microsoft SQL &amp; Windows BYOL Rules
+          </button>
+          <button class="ai-chip-btn" data-query="What is the optimal database consolidation pathway for our 58 SQL Server, Oracle, DB2, and MySQL servers?">
+            Database Consolidation &amp; AlloyDB Pathways
+          </button>
+          <button class="ai-chip-btn" data-query="Why should  the Enterprise Estate combine Google Cloud VMware Engine (GCVE) with native GCE over 100 Gbps Shared VPC?">
+            Why Google Cloud (GCVE + Native GCE)?
+          </button>
+          <button class="ai-chip-btn" data-query="What are our fastest quick-win cost savings from Zombie VMs and Non-Prod scheduling?">
+            Zombie VMs &amp; Quick-Win TCO Levers
+          </button>
+        </div>
+
+        <div style="display:flex; gap:0.75rem;">
+          <input type="text" id="ai-query-input" class="form-input" placeholder="Ask the Principal AI Architect anything about this assessment..." style="flex:1;">
+          <button id="btn-ask-ai" class="btn btn-primary">Ask Advisor</button>
+        </div>
+
+        <div id="ai-response-box" class="ai-response-card" style="margin-top:0.85rem;">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- 5-Pillar Google Cloud WAF Scorecard -->
+      <div class="card-panel" style="margin-top:1.5rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.85rem;">
+          <div>
+            <h3 class="panel-title" style="margin:0;">Google Cloud Well-Architected Framework (WAF) Scorecard</h3>
+            <p class="section-subtitle">Click <strong>"Apply AI Remediation"</strong> on any warning control to simulate architectural remediation and update the compliance score.</p>
+          </div>
+          <div class="waf-overall-badge" id="waf-overall-badge">Overall Compliance: 68%</div>
+        </div>
+
+        <div class="waf-pillars-grid" id="waf-pillars-grid"></div>
+        <div class="waf-controls-list" id="waf-controls-list" style="margin-top:1rem;"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL 1: Per-Application Deep-Dive Modal (Slide 5 PeopleSoft / SAP style) -->
+  <!-- ========================================================================= -->
+  <div id="modal-app-detail" class="modal-backdrop hidden" aria-hidden="true">
+    <div class="modal-dialog modal-large">
+      <div class="modal-header">
+        <div>
+          <span class="badge-pill" id="app-modal-tier">Application Assessment Deep-Dive (Slide 5)</span>
+          <h3 id="app-modal-title" style="margin-top:0.35rem;">Application Name</h3>
+        </div>
+        <button id="btn-close-app-modal" class="modal-close" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body" id="app-modal-body">
+        <!-- Populated dynamically by app.js -->
+      </div>
+      <div class="modal-footer">
+        <button id="btn-close-app-footer" class="btn btn-secondary">Close Deep-Dive</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL 2: Export Code & Deliverable Preview Modal                          -->
+  <!-- ========================================================================= -->
+  <div id="modal-backdrop" class="modal-backdrop hidden" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="modal-title">Export Deliverable</h3>
+        <button id="btn-close-modal" class="modal-close" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <pre id="modal-code-content" class="code-preview"></pre>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-copy-code" class="btn btn-secondary">Copy to Clipboard</button>
+        <button id="btn-download-file" class="btn btn-primary">Download File</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL 3: Add Custom Workload Modal                                        -->
+  <!-- ========================================================================= -->
+  <div id="modal-add-workload" class="modal-backdrop hidden" aria-hidden="true">
+    <div class="modal-dialog modal-small">
+      <div class="modal-header">
+        <h3>Add Discovered Workload to Scope</h3>
+        <button id="btn-close-add" class="modal-close" aria-label="Close">&times;</button>
+      </div>
+      <form id="form-add-workload" class="modal-body form-grid">
+        <div class="form-field">
+          <label for="add-name">Application / Workload Name</label>
+          <input type="text" id="add-name" required placeholder="e.g., National Traffic Telemetry Ingestion" class="form-input">
+        </div>
+        <div class="form-field">
+          <label for="add-source">Source Technology Stack</label>
+          <input type="text" id="add-source" required placeholder="e.g., Apache Kafka + Python on 6x RHEL 7 VMs" class="form-input">
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label for="add-servers">Server Count</label>
+            <input type="number" id="add-servers" value="6" min="1" max="500" class="form-input">
+          </div>
+          <div class="form-field">
+            <label for="add-vcpu">Total vCPU</label>
+            <input type="number" id="add-vcpu" value="48" min="2" max="2048" class="form-input">
+          </div>
+          <div class="form-field">
+            <label for="add-ram">Total RAM (GB)</label>
+            <input type="number" id="add-ram" value="192" min="4" max="8192" class="form-input">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label for="add-cost">Current Annual Run-Rate (USD)</label>
+            <input type="number" id="add-cost" value="84000" min="1000" step="1000" class="form-input">
+          </div>
+          <div class="form-field">
+            <label for="add-6r">Recommended 6R Strategy</label>
+            <select id="add-6r" class="select-input">
+              <option value="Refactor">Refactor (Cloud-Native / Serverless)</option>
+              <option value="Replatform" selected>Replatform (Lift &amp; Optimize)</option>
+              <option value="Rehost">Rehost (Lift &amp; Shift / GCVE)</option>
+              <option value="Replace">Replace (Managed Cloud Native / SaaS)</option>
+              <option value="Retire">Retire (Decommission &amp; Coldline Archive)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="add-target">Target Google Cloud Architecture</label>
+          <input type="text" id="add-target" value="Cloud Pub/Sub + Dataflow Streaming + BigQuery" required class="form-input">
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Add to Active Estate Assessment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL 4: Customer Data Ingestion Engine (RVTools / Migration Center / CSV) -->
+  <!-- ========================================================================= -->
+  <div id="modal-ingest-data" class="modal-backdrop hidden" aria-hidden="true">
+    <div class="modal-dialog modal-large">
+      <div class="modal-header">
+        <div>
+          <span class="badge-pill">Automated Discovery &amp; Telemetry Parser</span>
+          <h3 style="margin-top:0.35rem;">Ingest Customer Infrastructure Data (RVTools / Migration Center / CSV)</h3>
+        </div>
+        <button id="btn-close-ingest" class="modal-close" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:0.84rem; color:var(--text-secondary); margin-bottom:1rem;">
+          Upload or paste customer discovery exports from <strong>RVTools (<code>vInfo</code> / <code>vCPU</code>)</strong>, <strong>Google Cloud Migration Center</strong>, <strong>DrMigrate</strong>, or standard server inventory CSVs. The engine automatically detects <strong>OS End-of-Support dates</strong>, flags <strong>Zombie VMs (&lt;5% CPU)</strong>, computes <strong>Right-Sizing (-68% cores)</strong>, and maps databases to <strong>Cloud SQL / AlloyDB</strong>.
+        </p>
+
+        <div class="form-row" style="margin-bottom:1rem;">
+          <div class="form-field">
+            <label for="ingest-client-name">Customer / Organization Name</label>
+            <input type="text" id="ingest-client-name" value="Qatar National Energy &amp; Logistics" class="form-input">
+          </div>
+          <div class="form-field">
+            <label for="ingest-industry">Industry Sector</label>
+            <input type="text" id="ingest-industry" value="Energy, Utilities &amp; Infrastructure" class="form-input">
+          </div>
+          <div class="form-field">
+            <label for="ingest-region">Target Google Cloud Region</label>
+            <select id="ingest-region" class="select-input">
+              <option value="me-central1 (Doha, Qatar)" selected>me-central1 (Doha, Qatar — Sovereign)</option>
+              <option value="europe-west3 (Frankfurt, Germany)">europe-west3 (Frankfurt, Germany)</option>
+              <option value="europe-west2 (London, UK)">europe-west2 (London, UK)</option>
+              <option value="us-central1 (Iowa, USA)">us-central1 (Iowa, USA)</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+          <label for="ingest-csv-text" style="font-size:0.78rem; font-weight:600; color:var(--text-secondary);">
+            Upload CSV File or Edit Discovery Telemetry Payload Below:
+          </label>
+          <div style="display:flex; gap:0.5rem;">
+            <label class="btn btn-secondary" style="cursor:pointer; font-size:0.75rem; padding:0.35rem 0.7rem;">
+              Upload .CSV File
+              <input type="file" id="ingest-file-input" accept=".csv,.txt" style="display:none;">
+            </label>
+            <button type="button" id="btn-load-sample-csv" class="btn btn-secondary" style="font-size:0.75rem; padding:0.35rem 0.7rem;">
+              Load Sample RVTools CSV (12 Servers)
+            </button>
+            <button type="button" id="btn-download-sample-csv" class="btn btn-secondary" style="font-size:0.75rem; padding:0.35rem 0.7rem;">
+              Download CSV Template
+            </button>
+          </div>
+        </div>
+
+        <textarea id="ingest-csv-text" rows="10" class="code-preview" style="width:100%; font-family:var(--font-mono); font-size:0.76rem; resize:vertical;"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="btn-cancel-ingest" class="btn btn-secondary">Cancel</button>
+        <button type="button" id="btn-run-ingestion" class="btn btn-primary">
+          Run Discovery &amp; 6R Classification Engine &rarr;
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- FLOATING VERTEX AI ARCHITECTURE COPILOT WIDGET & SLIDE-OUT DRAWER         -->
+  <!-- ========================================================================= -->
+  <button type="button" id="vertex-copilot-fab" class="vertex-copilot-fab" title="Ask Google Cloud Vertex AI Architecture Agent">
+    <span>&#10024;</span>
+    <span>Ask Vertex AI Agent</span>
+  </button>
+
+  <aside id="vertex-copilot-drawer" class="vertex-copilot-drawer hidden" aria-label="Vertex AI Architecture Agent">
+    <div class="vertex-chat-header">
+      <div>
+        <div style="font-size:13.5px; font-weight:700;">&#10024; Vertex AI Architecture Copilot</div>
+        <div style="font-size:11px; opacity:0.9;">Grounded in Live Estate Telemetry • gemini-2.5-flash</div>
+      </div>
+      <div style="display:flex; gap:6px; align-items:center;">
+        <button type="button" id="btn-clear-vertex-chat" style="background:rgba(255,255,255,0.2); border:none; color:#fff; border-radius:4px; padding:3px 7px; font-size:11px; cursor:pointer;" title="Reset Conversation">Clear</button>
+        <button type="button" id="btn-close-vertex-drawer" style="background:transparent; border:none; color:#fff; font-size:18px; line-height:1; cursor:pointer;" aria-label="Close">&times;</button>
+      </div>
+    </div>
+
+    <div id="vertex-chat-messages" class="vertex-chat-messages">
+      <div class="vertex-chat-bubble assistant">
+        <strong>Vertex AI Principal Cloud Architect:</strong><br>
+        Hello! I am connected to your active client estate telemetry. Ask me anything about <strong>6R workload pathways</strong>, <strong>Windows/SQL Server BYOL rules</strong>, <strong>AlloyDB database consolidation</strong>, <strong>Zombie VM savings</strong>, or <strong>Google Cloud Well-Architected remediation</strong>.
+      </div>
+    </div>
+
+    <div style="padding:6px 12px; border-top:1px solid var(--border-subtle); background:var(--bg-elevated); display:flex; gap:6px; overflow-x:auto; white-space:nowrap;">
+      <button type="button" class="vertex-quick-chip btn btn-secondary" style="font-size:11px; padding:3px 8px;" data-q="What are our top 3 TCO savings levers and zombie VM savings?">Top 3 Savings Levers</button>
+      <button type="button" class="vertex-quick-chip btn btn-secondary" style="font-size:11px; padding:3px 8px;" data-q="How should we modernize our SQL Server and Oracle databases to Cloud SQL and AlloyDB?">Database Modernization</button>
+      <button type="button" class="vertex-quick-chip btn btn-secondary" style="font-size:11px; padding:3px 8px;" data-q="How do we remediate the 292 OS End-of-Support servers during migration?">OS EOL Remediation</button>
+    </div>
+
+    <form id="vertex-chat-form" class="vertex-chat-input-bar">
+      <input type="text" id="vertex-chat-input" class="form-input" placeholder="Ask Vertex AI anything about this architecture..." style="flex:1; font-size:12.5px;" required>
+      <button type="submit" class="btn btn-primary" style="padding:6px 14px; font-size:12.5px;">Send</button>
+    </form>
+  </aside>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
