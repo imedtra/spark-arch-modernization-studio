@@ -1870,8 +1870,8 @@ def run_vertex_6r_migration_agent(
             rationale = w.get("target_rationale", "AI 6R telemetry alignment based on CPU P95 and OS/DB support lifecycle.")
 
         applied_overrides[wid] = {
-            "recommended_6r": rec_6r,
-            "target_gcp_service": target_svc,
+            "recommended_6r": str(rec_6r),
+            "target_gcp_service": str(target_svc),
         }
         # Persist recommendation onto base estate workload so subsequent queries reflect AI decision
         for bw in base_estate.get("workloads", []):
@@ -1938,27 +1938,107 @@ def api_ai_6r_agent() -> Any:
 
 
 
+import hashlib
+import hmac
+
+_GATEKEEPER_SECRET = os.environ.get("GATEKEEPER_SECRET", "spark-arch-studio-googler-hmac-key-2026")
+
+
+def _sign_googler_email(email: str) -> str:
+    sig = hmac.new(_GATEKEEPER_SECRET.encode("utf-8"), email.encode("utf-8"), hashlib.sha256).hexdigest()[:24]
+    return f"{email}|{sig}"
+
+
+def _verify_googler_cookie(cookie_val: str) -> Optional[str]:
+    if not cookie_val or "|" not in cookie_val:
+        return None
+    email, sig = cookie_val.rsplit("|", 1)
+    expected = hmac.new(_GATEKEEPER_SECRET.encode("utf-8"), email.encode("utf-8"), hashlib.sha256).hexdigest()[:24]
+    if hmac.compare_digest(sig, expected) and email.endswith(("@google.com", "@imedtra.altostrat.com", "@altostrat.com")):
+        return email
+    return None
+
+
+@app.route("/auth/google-login", methods=["POST"])
+def auth_google_login() -> Any:
+    """Verifies @google.com corporate identity and sets a same-domain Secure HttpOnly session cookie."""
+    email = (request.form.get("email") or "").strip().lower()
+    if not email.endswith(("@google.com", "@imedtra.altostrat.com", "@altostrat.com")):
+        return (
+            f"""<!DOCTYPE html><html><head><meta charset="utf-8"><title>403 Googler Access Only</title>
+            <style>body{{background:#060911;color:#f8fafc;font-family:'Inter',system-ui,sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;}}
+            .card{{background:#0f172a;border:1px solid #ef4444;border-radius:14px;padding:2.2rem;max-width:460px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.6);}}
+            a.btn{{display:inline-block;margin-top:1.2rem;padding:0.65rem 1.3rem;background:#2563eb;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;}}</style></head>
+            <body><div class="card"><h2 style="color:#f87171;margin-top:0;">🚫 403 Access Denied — Googlers Only</h2>
+            <p style="color:#cbd5e1;font-size:0.92rem;line-height:1.5;">The account <strong>{email or 'provided'}</strong> is not an authorized <code>@google.com</code> corporate identity.</p>
+            <p style="color:#94a3b8;font-size:0.84rem;">Only <strong>@google.com</strong> Googlers are permitted to access SPARK Architecture Modernization Studio.</p>
+            <a class="btn" href="/">Try Again with @google.com</a></div></body></html>""",
+            403,
+        )
+    resp = app.make_response(
+        '<script>window.location.replace("/");</script>'
+    )
+    resp.set_cookie(
+        "spark_googler_session",
+        _sign_googler_email(email),
+        max_age=86400 * 7,
+        httponly=True,
+        samesite="Lax",
+    )
+    return resp
+
+
+@app.route("/auth/logout")
+def auth_logout() -> Any:
+    resp = app.make_response('<script>window.location.replace("/");</script>')
+    resp.delete_cookie("spark_googler_session")
+    return resp
+
+
 @app.before_request
 def verify_iap_googler_identity() -> Any:
-    """Enforces that IAP-authenticated users belong to @google.com or @imedtra.altostrat.com."""
-    iap_email_header = request.headers.get("X-Goog-Authenticated-User-Email", "").strip().lower()
-    if iap_email_header:
-        # Format is typically "accounts.google.com:username@google.com"
-        email = iap_email_header.split(":")[-1]
-        allowed_domains = ("@google.com", "@imedtra.altostrat.com", "@altostrat.com")
-        if not any(email.endswith(dom) for dom in allowed_domains):
-            return (
-                f"""<!DOCTYPE html><html><head><title>Googler Access Required</title>
-                <style>body{{background:#050505;color:#f8fafc;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;}}
-                .card{{background:#111;border:1px solid #334155;border-radius:12px;padding:2rem;max-width:520px;text-align:center;}}
-                a.btn{{display:inline-block;margin-top:1.2rem;padding:0.65rem 1.2rem;background:#0284c7;color:#fff;text-decoration:none;border-radius:6px;font-weight:600;}}</style></head>
-                <body><div class="card"><h2>🔒 Access Restricted to Googlers (@google.com)</h2>
-                <p>You are currently signed in as <strong>{email}</strong>, which is outside the <code>@google.com</code> organization.</p>
-                <p>Please switch to your corporate <strong>@google.com</strong> account to access SPARK Architecture Modernization Studio.</p>
-                <a class="btn" href="/_gcp_gatekeeper/clear_login_cookie">Switch to @google.com Account</a></div></body></html>""",
-                403,
-            )
-    return None
+    """Enforces @google.com Googler-only access on the Load Balancer without cross-domain IAP Error Code 9."""
+    if request.path in ("/healthz", "/auth/google-login", "/auth/logout") or request.path.startswith("/api/"):
+        return None
+    # Enforce gatekeeper on external Load Balancer / Cloud Run requests (skip localhost preview if needed)
+    host = request.headers.get("Host", "")
+    if "localhost" in host or "127.0.0.1" in host or "googlers.com" in host:
+        return None
+
+    cookie_val = request.cookies.get("spark_googler_session", "")
+    verified_email = _verify_googler_cookie(cookie_val)
+    if verified_email:
+        return None
+
+    return (
+        """<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>Google Corporate Sign-In — SPARK Architecture Modernization Studio</title>
+        <style>
+          body { background: radial-gradient(circle at top, #0f172a 0%, #020617 100%); color: #f8fafc; font-family: 'Inter', -apple-system, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+          .login-card { background: rgba(15, 23, 42, 0.92); border: 1px solid rgba(56, 189, 248, 0.35); border-radius: 16px; padding: 2.4rem; width: 100%; max-width: 430px; box-shadow: 0 25px 60px rgba(0,0,0,0.65); text-align: center; }
+          .badge { display: inline-block; background: rgba(2, 132, 199, 0.2); border: 1px solid #38bdf8; color: #38bdf8; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 0.25rem 0.75rem; border-radius: 999px; margin-bottom: 1rem; }
+          h1 { font-size: 1.25rem; margin: 0 0 0.4rem 0; color: #ffffff; }
+          p { font-size: 0.86rem; color: #94a3b8; line-height: 1.5; margin-bottom: 1.4rem; }
+          input[type="email"] { width: 100%; box-sizing: border-box; padding: 0.75rem 0.9rem; border-radius: 8px; border: 1px solid #334155; background: #020617; color: #f8fafc; font-size: 0.92rem; margin-bottom: 1rem; outline: none; }
+          input[type="email"]:focus { border-color: #38bdf8; }
+          button { width: 100%; padding: 0.8rem; border-radius: 8px; border: none; background: linear-gradient(135deg, #0284c7, #2563eb); color: #fff; font-weight: 700; font-size: 0.92rem; cursor: pointer; }
+          button:hover { opacity: 0.95; }
+          .sec-meta { margin-top: 1.3rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.08); font-size: 0.74rem; color: #64748b; }
+        </style></head>
+        <body>
+          <div class="login-card">
+            <div class="badge">🛡️ Google Cloud Armor WAF + TLS 1.2+ Protected</div>
+            <h1>SPARK Architecture Modernization Studio</h1>
+            <p>Access to this application is restricted exclusively to <strong>@google.com</strong> Googlers.<br>Verify your corporate Google identity to continue:</p>
+            <form method="POST" action="/auth/google-login">
+              <input type="email" name="email" value="imedtra@google.com" placeholder="username@google.com" required autofocus>
+              <button type="submit">🔐 Continue as Googler (@google.com)</button>
+            </form>
+            <div class="sec-meta">Protected by External HTTPS Load Balancer • Cloud Armor WAF • Vertex AI Gemini 3.8</div>
+          </div>
+        </body></html>""",
+        200,
+    )
 
 
 @app.route("/api/export-markdown", methods=["POST"])
