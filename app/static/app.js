@@ -405,7 +405,7 @@ async function runVertex6RAgent(switchTabFirst = false) {
   }
   if (badge) {
     badge.className = 'badge-6r badge-amber';
-    badge.innerHTML = '&#9889; Querying live Vertex AI (gemini-2.5-flash Structured Schema)...';
+    badge.innerHTML = '&#9889; Querying live Vertex AI (gemini-3.8 Structured Schema)...';
   }
   if (resultsBox) {
     resultsBox.style.display = 'block';
@@ -612,7 +612,7 @@ async function fetchAssessment() {
 
 async function askAIAdvisor(queryText) {
   const box = document.getElementById('ai-response-box');
-  box.innerHTML = `<div style="color:var(--text-secondary); font-size:0.85rem;">&#10024; Querying live Google Cloud Vertex AI (<code>gemini-2.5-flash</code> in <code>imedtra-arch-modernization</code>) on <em>"${queryText}"</em>...</div>`;
+  box.innerHTML = `<div style="color:var(--text-secondary); font-size:0.85rem;">&#10024; Querying live Google Cloud Vertex AI (<code>gemini-3.8</code> in <code>imedtra-arch-modernization</code>) on <em>"${queryText}"</em>...</div>`;
   try {
     const res = await fetch('/api/ai-advisor', {
       method: 'POST',
@@ -629,7 +629,7 @@ async function askAIAdvisor(queryText) {
       .replace(/`(.*?)`/g, '<code style="font-family:var(--font-mono); color:var(--accent-cyan);">$1</code>')
       .replace(/\n/g, '<br>');
     const statusPill = ans.live_vertex_ai
-      ? `<span class="badge-6r badge-emerald">&#128994; Live Vertex AI Connected &bull; ${ans.model || 'vertex-ai/gemini-2.5-flash'} (${ans.location || 'europe-west1'})</span>`
+      ? `<span class="badge-6r badge-emerald">&#128994; Live Vertex AI Connected &bull; ${ans.model || 'vertex-ai/gemini-3.8'} (${ans.location || 'europe-west1'})</span>`
       : `<span class="badge-6r badge-amber">&#9889; Grounded Telemetry Engine</span>`;
     box.innerHTML = `
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.55rem;">
@@ -1671,7 +1671,7 @@ async function sendVertexCopilotMessage(userText) {
       .replace(/\n/g, '<br>');
 
     const liveTag = ans.live_vertex_ai
-      ? `<span style="display:inline-block; background:rgba(16,185,129,0.14); color:#10b981; border:1px solid rgba(16,185,129,0.35); border-radius:4px; padding:1px 6px; font-size:10px; font-weight:700; margin-left:6px;">&#128994; Live ${ans.model || 'vertex-ai/gemini-2.5-flash'}</span>`
+      ? `<span style="display:inline-block; background:rgba(16,185,129,0.14); color:#10b981; border:1px solid rgba(16,185,129,0.35); border-radius:4px; padding:1px 6px; font-size:10px; font-weight:700; margin-left:6px;">&#128994; Live ${ans.model || 'vertex-ai/gemini-3.8'}</span>`
       : `<span style="display:inline-block; background:rgba(245,158,11,0.14); color:#f59e0b; border-radius:4px; padding:1px 6px; font-size:10px; font-weight:700; margin-left:6px;">&#9889; Grounded Fallback</span>`;
 
     thinkingBubble.innerHTML = `

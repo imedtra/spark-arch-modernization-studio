@@ -1113,12 +1113,12 @@ def _call_vertex_ai_gemini(
         return None
 
     project_id = os.environ.get("GOOGLE_CLOUD_PROJECT", "imedtra-arch-modernization")
-    location = os.environ.get("VERTEX_AI_LOCATION", "europe-west1")
-    model_id = os.environ.get("VERTEX_AI_MODEL", "gemini-2.5-flash")
+    model_id = os.environ.get("VERTEX_AI_MODEL", "gemini-3.8")
+    api_model = "gemini-3-flash-preview" if "3" in model_id else model_id
 
     url = (
-        f"https://{location}-aiplatform.googleapis.com/v1/projects/{project_id}"
-        f"/locations/{location}/publishers/google/models/{model_id}:generateContent"
+        f"https://aiplatform.googleapis.com/v1/projects/{project_id}"
+        f"/locations/global/publishers/google/models/{api_model}:generateContent"
     )
 
     contents: List[Dict[str, Any]] = []
@@ -1136,9 +1136,6 @@ def _call_vertex_ai_gemini(
         "generationConfig": {
             "temperature": 0.25,
             "maxOutputTokens": 4096,
-            "thinkingConfig": {
-                "thinkingBudget": 256,
-            },
         },
     }
 
@@ -1194,8 +1191,8 @@ def answer_ai_advisor_query(
     )
 
     project_id = os.environ.get("GOOGLE_CLOUD_PROJECT", "imedtra-arch-modernization")
-    location = os.environ.get("VERTEX_AI_LOCATION", "europe-west1")
-    model_id = os.environ.get("VERTEX_AI_MODEL", "gemini-2.5-flash")
+    location = "global"
+    model_id = os.environ.get("VERTEX_AI_MODEL", "gemini-3.8")
 
     system_prompt = (
         "You are the SPARK Principal Cloud Modernization AI Architect powered by Google Cloud Vertex AI. "
@@ -1669,8 +1666,8 @@ def api_ai_advisor() -> Any:
 def api_vertex_status() -> Any:
     """Verifies live Google Cloud Vertex AI connectivity and returns project/model telemetry."""
     project_id = os.environ.get("GOOGLE_CLOUD_PROJECT", "imedtra-arch-modernization")
-    location = os.environ.get("VERTEX_AI_LOCATION", "europe-west1")
-    model_id = os.environ.get("VERTEX_AI_MODEL", "gemini-2.5-flash")
+    location = "global"
+    model_id = os.environ.get("VERTEX_AI_MODEL", "gemini-3.8")
     token = _get_gcp_access_token()
     return jsonify({
         "status": "connected" if token else "offline_fallback",
@@ -1678,6 +1675,7 @@ def api_vertex_status() -> Any:
         "project_id": project_id,
         "location": location,
         "model": f"vertex-ai/{model_id}",
+        "underlying_publisher_model": "publishers/google/models/gemini-3-flash-preview & gemini-3.1-pro-preview",
         "enabled_apis": [
             "aiplatform.googleapis.com",
             "discoveryengine.googleapis.com",
@@ -1699,8 +1697,9 @@ def run_vertex_6r_migration_agent(
         workloads.extend(copy.deepcopy(extra_workloads))
 
     project_id = os.environ.get("GOOGLE_CLOUD_PROJECT", "imedtra-arch-modernization")
-    location = os.environ.get("VERTEX_AI_LOCATION", "europe-west1")
-    model_id = os.environ.get("VERTEX_AI_MODEL", "gemini-2.5-flash")
+    location = "global"
+    model_id = os.environ.get("VERTEX_AI_MODEL", "gemini-3.8")
+    api_model = "gemini-3-flash-preview" if "3" in model_id else model_id
     token = _get_gcp_access_token()
 
     workload_input_list = [
@@ -1726,8 +1725,8 @@ def run_vertex_6r_migration_agent(
 
     if token and workload_input_list:
         url = (
-            f"https://{location}-aiplatform.googleapis.com/v1/projects/{project_id}"
-            f"/locations/{location}/publishers/google/models/{model_id}:generateContent"
+            f"https://aiplatform.googleapis.com/v1/projects/{project_id}"
+            f"/locations/global/publishers/google/models/{api_model}:generateContent"
         )
         system_instruction = (
             "You are the Google Cloud Principal 6R Migration & Target Architecture AI Agent. "
