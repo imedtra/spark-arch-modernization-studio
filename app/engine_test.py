@@ -89,8 +89,9 @@ class EngineTest(unittest.TestCase):
             csv_text=app_mod.SAMPLE_RVTOOLS_CSV,
         )
         res = app_mod.compute_assessment(estate_id)
-        self.assertEqual(res["summary_metrics"]["total_servers"], 12)
-        self.assertGreaterEqual(res["estate_overview"]["utilization_summary"]["zombie_servers_under_5_count"], 2)
+        self.assertEqual(res["summary_metrics"]["total_servers"], 50)
+        self.assertEqual(res["summary_metrics"]["total_applications"], 12)
+        self.assertGreaterEqual(res["estate_overview"]["utilization_summary"]["zombie_servers_under_5_count"], 3)
         self.assertGreater(res["migration_scenarios"]["scenario_2_modernize"]["annual_savings_usd"], 0)
 
 

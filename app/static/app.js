@@ -300,7 +300,7 @@ function initPage1FileUpload() {
         const data = await res.json();
         if (csvArea) csvArea.value = data.csv || '';
         if (statusEl) {
-          statusEl.innerHTML = `<strong style="color:var(--accent-emerald);">&#9989; Loaded Sample Discovery File: <code>customer_rvtools_discovery_sample.csv</code> (12 enterprise servers ready)</strong>`;
+          statusEl.innerHTML = `<strong style="color:var(--accent-emerald);">&#9989; Loaded Sample Discovery File: <code>rvtools_50_servers_enterprise_example.csv</code> (50 enterprise servers across 12 applications ready)</strong>`;
         }
       } catch (err) {
         console.error('Failed to load sample CSV on Page 1:', err);

@@ -1614,19 +1614,57 @@ def api_export_terraform() -> Any:
 # 6. Automated Customer Data Ingestion Engine (RVTools / Migration Center / CSV)
 # ==============================================================================
 
-SAMPLE_RVTOOLS_CSV = """VM_Name,Application,OS_Version,vCPU,Memory_GB,Storage_TB,CPU_P95_Pct,Environment,Database_Engine,Software_Stack,Annual_Cost_USD
-VM_DB_01,SAP ERP Core Financials,Red Hat Enterprise Linux 7 (64-bit),32,256,12.5,24,Production,Oracle Database 19c,SAP ERP / Oracle 19c,145000
-VM_DB_02,SAP ERP Core Financials,Red Hat Enterprise Linux 7 (64-bit),32,256,12.5,21,Production,Oracle Database 19c,SAP ERP / Oracle 19c,145000
-VM_SQL_01,National Billing & Revenue DB,Windows Server 2012 R2 Datacenter,16,128,8.0,19,Production,SQL Server 2012,Microsoft SQL Server 2012 Enterprise,98000
-VM_SQL_02,National Billing & Revenue DB,Windows Server 2012 R2 Datacenter,16,128,8.0,17,Production,SQL Server 2012,Microsoft SQL Server 2012 Enterprise,98000
-VM_WEB_01,Citizen E-Services Portal,Windows Server 2016 Standard,8,32,1.2,14,Production,None,Microsoft IIS 10.0 / ASP.NET,28000
-VM_WEB_02,Citizen E-Services Portal,Windows Server 2016 Standard,8,32,1.2,16,Production,None,Microsoft IIS 10.0 / ASP.NET,28000
-VM_WEB_03,Citizen E-Services Portal,Windows Server 2016 Standard,8,32,1.2,12,Non-Production,None,Microsoft IIS 10.0 / ASP.NET,22000
-VM_GIS_01,Esri ArcGIS Spatial Analytics,Windows Server 2019 Standard,16,64,6.0,27,Production,SQL Server 2019,Esri ArcGIS Enterprise 10.9,64000
-VM_GIS_02,Esri ArcGIS Spatial Analytics,Windows Server 2019 Standard,16,64,6.0,22,Non-Production,SQL Server 2019,Esri ArcGIS Enterprise 10.9,52000
-VM_ZOMBIE_01,Legacy Sandbox Test Clone,Windows Server 2008 R2 Enterprise,8,32,2.0,2,Non-Production,None,Legacy Dev Tools,24000
-VM_ZOMBIE_02,Deprecated HR Staging VM,Windows Server 2008 R2 Enterprise,8,32,2.0,3,Non-Production,MySQL 5.6,Apache Tomcat 7 / Java 7,24000
-VM_SEC_01,Active Directory & PKI Core,Windows Server 2019 Datacenter,8,32,1.5,18,Production,None,Active Directory / ADCS PKI,32000
+SAMPLE_RVTOOLS_CSV = """VM_Name,Powerstate,Datacenter,Cluster,Host,OS_Version,vCPU,Memory_GB,Storage_TB,CPU_P95_Pct,Environment,Application,Database_Engine,Software_Stack,Network_VLAN,Annual_Cost_USD
+VM_SAP_DB_01,poweredOn,DC-PRIMARY-01,CLS-MISSION-CRIT,esxi-mc-01.corp.local,Red Hat Enterprise Linux 8 (64-bit),64,512,24.0,34,Production,SAP S/4HANA & ERP Core Financials,Oracle Database 19c,SAP S/4HANA 2023 / Oracle 19c RAC Primary,VLAN-110-SAP-DB,185000
+VM_SAP_DB_02,poweredOn,DC-PRIMARY-01,CLS-MISSION-CRIT,esxi-mc-02.corp.local,Red Hat Enterprise Linux 8 (64-bit),64,512,24.0,29,Production,SAP S/4HANA & ERP Core Financials,Oracle Database 19c,SAP S/4HANA 2023 / Oracle 19c RAC Standby,VLAN-110-SAP-DB,185000
+VM_SAP_PAS_01,poweredOn,DC-PRIMARY-01,CLS-MISSION-CRIT,esxi-mc-03.corp.local,Red Hat Enterprise Linux 8 (64-bit),16,128,4.0,42,Production,SAP S/4HANA & ERP Core Financials,None,SAP NetWeaver ABAP Primary App Server (PAS),VLAN-112-SAP-APP,68000
+VM_SAP_AAS_01,poweredOn,DC-PRIMARY-01,CLS-MISSION-CRIT,esxi-mc-04.corp.local,Red Hat Enterprise Linux 8 (64-bit),16,128,4.0,31,Production,SAP S/4HANA & ERP Core Financials,None,SAP NetWeaver Additional App Server (AAS-1),VLAN-112-SAP-APP,68000
+VM_SAP_AAS_02,poweredOn,DC-PRIMARY-01,CLS-MISSION-CRIT,esxi-mc-01.corp.local,Red Hat Enterprise Linux 7 (64-bit),16,128,4.0,19,Non-Production,SAP S/4HANA & ERP Core Financials,None,SAP ERP QA & Transport Management System,VLAN-212-SAP-QA,54000
+VM_SAP_WDP_01,poweredOn,DC-PRIMARY-01,CLS-DMZ-EDGE,esxi-dmz-01.corp.local,Red Hat Enterprise Linux 8 (64-bit),8,32,1.5,22,Production,SAP S/4HANA & ERP Core Financials,None,SAP Web Dispatcher & Fiori Launchpad Reverse Proxy,VLAN-102-DMZ,29000
+VM_BILL_SQL_01,poweredOn,DC-PRIMARY-01,CLS-DB-TIER,esxi-db-01.corp.local,Windows Server 2012 R2 Datacenter,32,256,16.0,23,Production,National Revenue & Billing Platform,SQL Server 2012,Microsoft SQL Server 2012 Enterprise AlwaysOn Primary,VLAN-120-DB,124000
+VM_BILL_SQL_02,poweredOn,DC-DR-02,CLS-DB-TIER-DR,esxi-dr-01.corp.local,Windows Server 2012 R2 Datacenter,32,256,16.0,18,Production,National Revenue & Billing Platform,SQL Server 2012,Microsoft SQL Server 2012 Enterprise AlwaysOn Secondary,VLAN-120-DB,124000
+VM_BILL_API_01,poweredOn,DC-PRIMARY-01,CLS-APP-PROD,esxi-app-01.corp.local,Windows Server 2016 Standard,8,32,1.5,16,Production,National Revenue & Billing Platform,None,Microsoft IIS 10.0 / .NET Framework 4.8 Billing Engine,VLAN-121-APP,31000
+VM_BILL_API_02,poweredOn,DC-PRIMARY-01,CLS-APP-PROD,esxi-app-02.corp.local,Windows Server 2016 Standard,8,32,1.5,15,Production,National Revenue & Billing Platform,None,Microsoft IIS 10.0 / .NET Framework 4.8 Billing Engine,VLAN-121-APP,31000
+VM_BILL_BATCH_01,poweredOn,DC-PRIMARY-01,CLS-APP-PROD,esxi-app-03.corp.local,Windows Server 2016 Standard,16,64,4.0,28,Production,National Revenue & Billing Platform,None,Invoice PDF Generation & Batch Settlement Worker,VLAN-121-APP,46000
+VM_BILL_UAT_01,poweredOn,DC-PRIMARY-01,CLS-NONPROD,esxi-dev-01.corp.local,Windows Server 2012 R2 Standard,8,32,2.0,11,Non-Production,National Revenue & Billing Platform,SQL Server 2012,Billing UAT & Regression Test Server,VLAN-220-UAT,26000
+VM_PORTAL_WEB_01,poweredOn,DC-PRIMARY-01,CLS-DMZ-EDGE,esxi-dmz-01.corp.local,Ubuntu Linux 22.04 LTS (64-bit),8,32,1.0,45,Production,Customer Digital Portal & Mobile API Gateway,None,NGINX Ingress / Spring Boot 3.2 Microservices,VLAN-101-WEB,27000
+VM_PORTAL_WEB_02,poweredOn,DC-PRIMARY-01,CLS-DMZ-EDGE,esxi-dmz-02.corp.local,Ubuntu Linux 22.04 LTS (64-bit),8,32,1.0,41,Production,Customer Digital Portal & Mobile API Gateway,None,NGINX Ingress / Spring Boot 3.2 Microservices,VLAN-101-WEB,27000
+VM_PORTAL_WEB_03,poweredOn,DC-PRIMARY-01,CLS-DMZ-EDGE,esxi-dmz-01.corp.local,Ubuntu Linux 22.04 LTS (64-bit),8,32,1.0,38,Production,Customer Digital Portal & Mobile API Gateway,None,NGINX Ingress / Spring Boot 3.2 Microservices,VLAN-101-WEB,27000
+VM_PORTAL_WEB_04,poweredOn,DC-PRIMARY-01,CLS-NONPROD,esxi-dev-02.corp.local,Ubuntu Linux 20.04 LTS (64-bit),8,16,1.0,14,Non-Production,Customer Digital Portal & Mobile API Gateway,None,Digital Portal Staging & CI/CD Preview Node,VLAN-201-STG,19000
+VM_PORTAL_PG_01,poweredOn,DC-PRIMARY-01,CLS-DB-TIER,esxi-db-02.corp.local,Red Hat Enterprise Linux 8 (64-bit),16,64,6.0,36,Production,Customer Digital Portal & Mobile API Gateway,PostgreSQL 15,PostgreSQL 15 Patroni HA Primary Cluster,VLAN-120-DB,52000
+VM_PORTAL_PG_02,poweredOn,DC-DR-02,CLS-DB-TIER-DR,esxi-dr-02.corp.local,Red Hat Enterprise Linux 8 (64-bit),16,64,6.0,24,Production,Customer Digital Portal & Mobile API Gateway,PostgreSQL 15,PostgreSQL 15 Patroni HA Read Replica,VLAN-120-DB,52000
+VM_EDW_ORA_01,poweredOn,DC-PRIMARY-01,CLS-DB-TIER,esxi-db-03.corp.local,Red Hat Enterprise Linux 7 (64-bit),32,256,35.0,26,Production,Enterprise Data Warehouse & BI Analytics,Oracle Database 19c,Oracle 19c Data Warehouse Partitioned Store,VLAN-130-EDW,162000
+VM_EDW_ORA_02,poweredOn,DC-DR-02,CLS-DB-TIER-DR,esxi-dr-03.corp.local,Red Hat Enterprise Linux 7 (64-bit),32,256,35.0,19,Production,Enterprise Data Warehouse & BI Analytics,Oracle Database 19c,Oracle 19c Data Guard Standby Warehouse,VLAN-130-EDW,162000
+VM_EDW_ETL_01,poweredOn,DC-PRIMARY-01,CLS-APP-PROD,esxi-app-04.corp.local,Red Hat Enterprise Linux 7 (64-bit),16,64,8.0,29,Production,Enterprise Data Warehouse & BI Analytics,None,Informatica PowerCenter 10.5 ETL Grid Node 1,VLAN-131-ETL,58000
+VM_EDW_ETL_02,poweredOn,DC-PRIMARY-01,CLS-APP-PROD,esxi-app-05.corp.local,Red Hat Enterprise Linux 7 (64-bit),16,64,8.0,25,Production,Enterprise Data Warehouse & BI Analytics,None,Informatica PowerCenter 10.5 ETL Grid Node 2,VLAN-131-ETL,58000
+VM_EDW_BI_01,poweredOn,DC-PRIMARY-01,CLS-APP-PROD,esxi-app-06.corp.local,Windows Server 2019 Standard,16,64,4.0,21,Production,Enterprise Data Warehouse & BI Analytics,None,Tableau Server / SAP BusinessObjects BI Portal,VLAN-132-BI,54000
+VM_GIS_SRV_01,poweredOn,DC-PRIMARY-01,CLS-APP-PROD,esxi-app-01.corp.local,Windows Server 2019 Standard,16,64,6.0,27,Production,Esri ArcGIS Spatial & Digital Twin Platform,None,Esri ArcGIS Enterprise 10.9.1 GIS Server Primary,VLAN-140-GIS,64000
+VM_GIS_SRV_02,poweredOn,DC-PRIMARY-01,CLS-APP-PROD,esxi-app-02.corp.local,Windows Server 2019 Standard,16,64,6.0,22,Production,Esri ArcGIS Spatial & Digital Twin Platform,None,Esri ArcGIS GeoEvent & Image Server Node,VLAN-140-GIS,64000
+VM_GIS_DB_01,poweredOn,DC-PRIMARY-01,CLS-DB-TIER,esxi-db-01.corp.local,Windows Server 2019 Datacenter,16,128,12.0,24,Production,Esri ArcGIS Spatial & Digital Twin Platform,SQL Server 2019,SQL Server 2019 Enterprise ArcSDE Spatial Geodatabase,VLAN-120-DB,82000
+VM_GIS_STG_01,poweredOn,DC-PRIMARY-01,CLS-NONPROD,esxi-dev-01.corp.local,Windows Server 2019 Standard,8,32,4.0,13,Non-Production,Esri ArcGIS Spatial & Digital Twin Platform,SQL Server 2019,Esri ArcGIS Staging & Map Tile Cache Generator,VLAN-240-GIS-DEV,38000
+VM_PAY_DB2_01,poweredOn,DC-PRIMARY-01,CLS-MISSION-CRIT,esxi-mc-02.corp.local,Red Hat Enterprise Linux 8 (64-bit),32,256,14.0,48,Production,Core Banking & Payment Switch (ISO-20022),IBM DB2 11.5,IBM DB2 11.5 HADR High-Throughput Ledger Primary,VLAN-150-FIN,148000
+VM_PAY_DB2_02,poweredOn,DC-DR-02,CLS-DB-TIER-DR,esxi-dr-01.corp.local,Red Hat Enterprise Linux 8 (64-bit),32,256,14.0,39,Production,Core Banking & Payment Switch (ISO-20022),IBM DB2 11.5,IBM DB2 11.5 HADR Synchronous Standby,VLAN-150-FIN,148000
+VM_PAY_MQ_01,poweredOn,DC-PRIMARY-01,CLS-MISSION-CRIT,esxi-mc-03.corp.local,Red Hat Enterprise Linux 8 (64-bit),16,64,3.0,35,Production,Core Banking & Payment Switch (ISO-20022),None,IBM WebSphere ND 9.0 & IBM MQ 9.2 SWIFT Gateway,VLAN-151-SWF,66000
+VM_PAY_MQ_02,poweredOn,DC-PRIMARY-01,CLS-MISSION-CRIT,esxi-mc-04.corp.local,Red Hat Enterprise Linux 8 (64-bit),16,64,3.0,33,Production,Core Banking & Payment Switch (ISO-20022),None,IBM WebSphere ND 9.0 & IBM MQ 9.2 ISO-20022 Processor,VLAN-151-SWF,66000
+VM_CRM_WEB_01,poweredOn,DC-PRIMARY-01,CLS-APP-PROD,esxi-app-03.corp.local,Windows Server 2016 Standard,8,32,1.5,18,Production,Omnichannel CRM & Contact Center Suite,None,Microsoft Dynamics 365 On-Premises Front-End IIS,VLAN-160-CRM,32000
+VM_CRM_WEB_02,poweredOn,DC-PRIMARY-01,CLS-APP-PROD,esxi-app-04.corp.local,Windows Server 2016 Standard,8,32,1.5,17,Production,Omnichannel CRM & Contact Center Suite,None,Microsoft Dynamics 365 Async Processing & CTI Adapter,VLAN-160-CRM,32000
+VM_CRM_SQL_01,poweredOn,DC-PRIMARY-01,CLS-DB-TIER,esxi-db-02.corp.local,Windows Server 2016 Datacenter,16,64,8.0,21,Production,Omnichannel CRM & Contact Center Suite,SQL Server 2016,SQL Server 2016 Standard CRM Organization DB,VLAN-120-DB,62000
+VM_CRM_DEV_01,poweredOn,DC-PRIMARY-01,CLS-NONPROD,esxi-dev-02.corp.local,Windows Server 2016 Standard,8,32,2.0,9,Non-Production,Omnichannel CRM & Contact Center Suite,SQL Server 2016,Dynamics 365 Sandbox & Customization Test VM,VLAN-260-CRM-DEV,25000
+VM_KAFKA_01,poweredOn,DC-PRIMARY-01,CLS-APP-PROD,esxi-app-05.corp.local,Red Hat Enterprise Linux 8 (64-bit),16,64,8.0,52,Production,Enterprise Integration Bus & Kafka Event Mesh,None,Apache Kafka 3.5 / Confluent Event Broker Node 1,VLAN-170-MESH,56000
+VM_KAFKA_02,poweredOn,DC-PRIMARY-01,CLS-APP-PROD,esxi-app-06.corp.local,Red Hat Enterprise Linux 8 (64-bit),16,64,8.0,49,Production,Enterprise Integration Bus & Kafka Event Mesh,None,Apache Kafka 3.5 / Confluent Event Broker Node 2,VLAN-170-MESH,56000
+VM_KAFKA_03,poweredOn,DC-PRIMARY-01,CLS-APP-PROD,esxi-app-01.corp.local,Red Hat Enterprise Linux 8 (64-bit),16,64,8.0,47,Production,Enterprise Integration Bus & Kafka Event Mesh,None,Apache Kafka 3.5 / Confluent Event Broker Node 3,VLAN-170-MESH,56000
+VM_MULE_GW_01,poweredOn,DC-PRIMARY-01,CLS-APP-PROD,esxi-app-02.corp.local,Red Hat Enterprise Linux 8 (64-bit),8,32,2.0,26,Production,Enterprise Integration Bus & Kafka Event Mesh,None,MuleSoft Runtime 4.4 & RabbitMQ ESB Bridge,VLAN-170-MESH,36000
+VM_MAXIMO_APP_01,poweredOn,DC-PRIMARY-01,CLS-APP-PROD,esxi-app-03.corp.local,Red Hat Enterprise Linux 7 (64-bit),8,32,2.5,19,Production,Supply Chain & Asset Management (Maximo),None,IBM Maximo 7.6.1 Asset Management WebSphere Node 1,VLAN-180-ERP,34000
+VM_MAXIMO_APP_02,poweredOn,DC-PRIMARY-01,CLS-APP-PROD,esxi-app-04.corp.local,Red Hat Enterprise Linux 7 (64-bit),8,32,2.5,16,Production,Supply Chain & Asset Management (Maximo),None,IBM Maximo 7.6.1 Asset Management WebSphere Node 2,VLAN-180-ERP,34000
+VM_MAXIMO_ORA_01,poweredOn,DC-PRIMARY-01,CLS-DB-TIER,esxi-db-03.corp.local,Red Hat Enterprise Linux 7 (64-bit),16,64,6.5,22,Production,Supply Chain & Asset Management (Maximo),Oracle Database 12c,Oracle Database 12c R2 (12.2.0.1) Asset Repository,VLAN-120-DB,68000
+VM_SEC_AD_01,poweredOn,DC-PRIMARY-01,CLS-SEC-CORE,esxi-sec-01.corp.local,Windows Server 2019 Datacenter,8,32,1.5,18,Production,Active Directory PKI & Cyber Security Core,None,Active Directory Domain Services (ADDS) & DNS Primary,VLAN-190-SEC,32000
+VM_SEC_PKI_02,poweredOn,DC-DR-02,CLS-SEC-CORE-DR,esxi-dr-02.corp.local,Windows Server 2019 Datacenter,8,32,1.5,14,Production,Active Directory PKI & Cyber Security Core,None,Active Directory Certificate Services (ADCS) Enterprise Root CA,VLAN-190-SEC,32000
+VM_SEC_SIEM_01,poweredOn,DC-PRIMARY-01,CLS-SEC-CORE,esxi-sec-01.corp.local,Red Hat Enterprise Linux 8 (64-bit),16,64,12.0,58,Production,Active Directory PKI & Cyber Security Core,None,Splunk Heavy Forwarder & Syslog Telemetry Collector,VLAN-190-SEC,64000
+VM_LEG_HR_01,poweredOn,DC-PRIMARY-01,CLS-LEGACY,esxi-leg-01.corp.local,Windows Server 2012 R2 Standard,8,16,2.0,8,Production,Legacy HR & Payroll Archival System,None,Apache Tomcat 7 / Java 7 Legacy Payroll Archive UI,VLAN-195-LEG,24000
+VM_LEG_DB_01,poweredOn,DC-PRIMARY-01,CLS-LEGACY,esxi-leg-01.corp.local,CentOS Linux 7 (64-bit),8,32,4.5,7,Production,Legacy HR & Payroll Archival System,MySQL 5.6,MySQL 5.6.51 Read-Only Historical Payroll DB,VLAN-195-LEG,28000
+VM_ZOMBIE_048,poweredOn,DC-PRIMARY-01,CLS-NONPROD,esxi-dev-01.corp.local,Windows Server 2008 R2 Enterprise,8,32,2.0,2,Non-Production,Decommissioned Sandbox & Orphaned Zombie VMs,None,Orphaned 2019 ERP Cutover Test Clone (Idle <5% CPU),VLAN-299-SANDBOX,24000
+VM_ZOMBIE_049,poweredOn,DC-PRIMARY-01,CLS-NONPROD,esxi-dev-02.corp.local,Windows Server 2008 R2 Enterprise,8,32,2.5,1,Non-Production,Decommissioned Sandbox & Orphaned Zombie VMs,MySQL 5.6,Deprecated Vendor POC Server (No Active Connections),VLAN-299-SANDBOX,24000
+VM_ZOMBIE_050,poweredOn,DC-PRIMARY-01,CLS-NONPROD,esxi-dev-02.corp.local,CentOS Linux 7 (64-bit),8,16,1.5,3,Non-Production,Decommissioned Sandbox & Orphaned Zombie VMs,None,Abandoned Jenkins Build Slave & Temp Artifact Host,VLAN-299-SANDBOX,18000
 """
 
 
@@ -1728,36 +1766,52 @@ def parse_and_ingest_customer_telemetry(
             if db_key not in db_map:
                 db_map[db_key] = {"engine": db_key, "servers": 0, "eol_servers": 0, "versions": {}}
             db_map[db_key]["servers"] += 1
-            if is_eos or "2008" in db_engine or "2012" in db_engine or "5.6" in db_engine:
+            if is_eos or "2008" in db_engine or "2012" in db_engine or "5.6" in db_engine or "12c" in db_engine.lower():
                 db_map[db_key]["eol_servers"] += 1
             db_map[db_key]["versions"][db_engine] = db_map[db_key]["versions"].get(db_engine, 0) + 1
 
         # Application / Workload Group aggregation
         if app_name not in app_groups:
-            # Determine 6R & Target GCP service automatically
-            if cpu_p95 < 5.0:
+            app_low = app_name.lower()
+            # Determine 6R & Target GCP service automatically across all 6 strategies
+            if cpu_p95 < 5.0 or "zombie" in app_low or "decommissioned" in app_low:
                 rec_6r = "Retire"
                 target_gcp = "Cloud Storage Archive + BigQuery Coldline Snapshot"
-                rationale = "Verified Zombie VM (<5% CPU P95) identified for immediate retirement."
+                rationale = "Verified Zombie VM (<5% CPU P95) identified for immediate decommissioning & Coldline archive."
                 cat = "compute_containers"
+            elif "legacy" in app_low or "archival" in app_low:
+                rec_6r = "Retain"
+                target_gcp = "Google Cloud VMware Engine (GCVE) Isolated Compliance Subnet"
+                rationale = "Encapsulate read-only legacy compliance/archival workload behind IAP until statutory retention expires."
+                cat = "compute_containers"
+            elif "banking" in app_low or "payment switch" in app_low or "db2" in db_engine.lower():
+                rec_6r = "Rehost"
+                target_gcp = "Google Cloud VMware Engine (GCVE) + Gen4 C4 High-Memory VMs"
+                rationale = "Zero-disruption HCX vMotion lift-and-shift preserving strict ISO-20022 payment switch certifications."
+                cat = "rdbms_persistence"
+            elif "active directory" in sw_stack.lower() or "pki" in sw_stack.lower() or "security" in app_low:
+                rec_6r = "Replace"
+                target_gcp = "Managed Service for Microsoft AD + Certificate Authority Service (CAS) + Chronicle SIEM"
+                rationale = "Consolidate identity, PKI, and SIEM forwarders onto managed Google Cloud Security operations."
+                cat = "security_perimeter"
+            elif "portal" in app_low or "kafka" in app_low or "event mesh" in app_low:
+                rec_6r = "Refactor"
+                target_gcp = "Google Kubernetes Engine (GKE Autopilot) + Managed Service for Apache Kafka + AlloyDB"
+                rationale = "Containerize stateless microservices on GKE Autopilot and offload Kafka/PostgreSQL to managed PaaS."
+                cat = "compute_containers"
+            elif "data warehouse" in app_low or "analytics" in app_low:
+                rec_6r = "Replatform"
+                target_gcp = "BigQuery Enterprise Edition + Cloud Data Fusion + Looker"
+                rationale = "Offload legacy Oracle DW & Informatica ETL grids into serverless petabyte-scale BigQuery."
+                cat = "analytics_ai"
             elif db_engine and db_engine.lower() != "none":
                 rec_6r = "Replatform"
-                target_gcp = "Cloud SQL Enterprise Plus (BYOL SA)" if "sql" in db_engine.lower() else "AlloyDB for PostgreSQL (via DMS AI Conversion)"
+                target_gcp = "Cloud SQL Enterprise Plus (BYOL SA)" if "sql" in db_engine.lower() else "AlloyDB for PostgreSQL / Bare Metal Solution for Oracle"
                 rationale = f"Consolidate {db_engine} onto managed multi-zone Google Cloud database with zero-downtime DMS replication."
                 cat = "rdbms_persistence"
-            elif "iis" in sw_stack.lower() or "tomcat" in sw_stack.lower() or "web" in app_name.lower():
-                rec_6r = "Refactor"
-                target_gcp = "Cloud Run Serverless Containers + Cloud Armor Enterprise WAF"
-                rationale = "Containerize stateless web/API tier into auto-scaling Cloud Run services."
-                cat = "compute_containers"
-            elif "active directory" in sw_stack.lower() or "pki" in sw_stack.lower() or "security" in app_name.lower():
-                rec_6r = "Replace"
-                target_gcp = "Managed Service for Microsoft AD + Certificate Authority Service (CAS) + IAP"
-                rationale = "Consolidate identity & PKI onto Google Cloud managed security services."
-                cat = "security_perimeter"
             else:
                 rec_6r = "Replatform"
-                target_gcp = "Google Compute Engine Gen4 C4 VMs / Google Cloud VMware Engine (GCVE)"
+                target_gcp = "Google Compute Engine Gen4 C4 VMs + Hyperdisk Balanced"
                 rationale = "Right-size over-provisioned compute onto Gen4 C4 instances connected via 100 Gbps Shared VPC."
                 cat = "compute_containers"
 
@@ -1971,8 +2025,8 @@ def api_list_estates() -> Any:
 
 @app.route("/api/sample-csv", methods=["GET"])
 def api_sample_csv() -> Any:
-    """Returns a sample RVTools / Migration Center CSV template for customer ingestion testing."""
-    return jsonify({"csv": SAMPLE_RVTOOLS_CSV, "filename": "customer_rvtools_discovery_sample.csv"})
+    """Returns a 50-server multi-application RVTools / Migration Center CSV template for customer ingestion."""
+    return jsonify({"csv": SAMPLE_RVTOOLS_CSV, "filename": "rvtools_50_servers_enterprise_example.csv"})
 
 
 @app.route("/api/ingest-telemetry", methods=["POST"])
