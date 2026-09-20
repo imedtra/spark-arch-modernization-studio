@@ -1570,14 +1570,14 @@ function applyCustomBackgroundColor(hexColor) {
   const root = document.documentElement;
 
   if (normalized === '#ffffff') {
-    // White Background Theme
-    root.style.setProperty('--bg-canvas', '#ffffff');
-    root.style.setProperty('--bg-surface', '#f8fafc');
-    root.style.setProperty('--bg-elevated', '#f1f5f9');
-    root.style.setProperty('--bg-hover', 'rgba(15, 23, 42, 0.06)');
+    // Google 4-Color Light Background Theme
+    root.style.setProperty('--bg-canvas', '#f0f4f9');
+    root.style.setProperty('--bg-surface', '#ffffff');
+    root.style.setProperty('--bg-elevated', '#e8f0fe');
+    root.style.setProperty('--bg-hover', 'rgba(66, 133, 244, 0.08)');
     root.style.setProperty('--header-bg', 'rgba(255, 255, 255, 0.96)');
-    root.style.setProperty('--border-subtle', '#e2e8f0');
-    root.style.setProperty('--border-strong', '#cbd5e1');
+    root.style.setProperty('--border-subtle', '#d2e3fc');
+    root.style.setProperty('--border-strong', '#aecbfa');
     root.style.setProperty('--text-primary', '#0f172a');
     root.style.setProperty('--text-secondary', '#334155');
     root.style.setProperty('--text-muted', '#64748b');

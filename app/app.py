@@ -2014,48 +2014,112 @@ def verify_iap_googler_identity() -> Any:
 
     return (
         """<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-        <title>Sign in — Google Accounts</title>
+        <title>Sign in — Google Cloud Architecture Studio</title>
         <style>
-          body { background: #f8f9fa; color: #202124; font-family: 'Google Sans', 'Roboto', -apple-system, BlinkMacSystemFont, Arial, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
-          .g-login-card { background: #ffffff; border: 1px solid #dadce0; border-radius: 8px; padding: 48px 40px 36px; width: 100%; max-width: 448px; box-sizing: border-box; text-align: center; }
-          .g-title { font-size: 24px; font-weight: 400; color: #202124; margin: 16px 0 8px 0; }
-          .g-subtitle { font-size: 16px; font-weight: 400; color: #202124; margin: 0 0 28px 0; }
-          .g-field-wrap { text-align: left; margin-bottom: 24px; }
-          .g-label { display: block; font-size: 12px; font-weight: 500; color: #1a73e8; margin-bottom: 6px; }
-          .g-input { width: 100%; box-sizing: border-box; padding: 13px 15px; border-radius: 4px; border: 1px solid #dadce0; background: #ffffff; color: #202124; font-size: 16px; outline: none; transition: border-color 0.15s; }
-          .g-input:focus { border: 2px solid #1a73e8; padding: 12px 14px; }
+          body {
+            background-color: #f0f4f9;
+            background-image:
+              radial-gradient(at 15% 15%, rgba(66, 133, 244, 0.16) 0px, transparent 45%),
+              radial-gradient(at 85% 18%, rgba(234, 67, 53, 0.12) 0px, transparent 45%),
+              radial-gradient(at 80% 85%, rgba(52, 168, 83, 0.14) 0px, transparent 45%),
+              radial-gradient(at 20% 82%, rgba(251, 188, 5, 0.14) 0px, transparent 45%);
+            color: #202124;
+            font-family: 'Google Sans', 'Roboto', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+          }
+          .google-top-ribbon {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #4285F4 0% 25%, #EA4335 25% 50%, #FBBC05 50% 75%, #34A853 75% 100%);
+            z-index: 100;
+          }
+          .g-login-card {
+            background: #ffffff;
+            border: 1px solid #d2e3fc;
+            border-radius: 16px;
+            padding: 40px 40px 34px;
+            width: 100%;
+            max-width: 460px;
+            box-sizing: border-box;
+            text-align: center;
+            box-shadow: 0 12px 36px rgba(66, 133, 244, 0.12), 0 4px 12px rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+          }
+          .g-card-stripe {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #4285F4 0% 25%, #EA4335 25% 50%, #FBBC05 50% 75%, #34A853 75% 100%);
+          }
+          .g-wordmark {
+            font-size: 22px;
+            font-weight: 700;
+            margin-top: 8px;
+            letter-spacing: -0.3px;
+          }
+          .g-title { font-size: 22px; font-weight: 500; color: #202124; margin: 10px 0 6px 0; }
+          .g-subtitle { font-size: 14.5px; font-weight: 400; color: #5f6368; margin: 0 0 20px 0; }
+          .g-pillars { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; margin-bottom: 24px; }
+          .g-pill { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 999px; }
+          .g-pill-blue { background: #e8f0fe; color: #1967d2; border: 1px solid #aecbfa; }
+          .g-pill-red { background: #fce8e6; color: #c5221f; border: 1px solid #f6aea9; }
+          .g-pill-yellow { background: #fef7e0; color: #b06000; border: 1px solid #fde293; }
+          .g-pill-green { background: #e6f4ea; color: #137333; border: 1px solid #a8dab5; }
+          .g-field-wrap { text-align: left; margin-bottom: 22px; }
+          .g-label { display: block; font-size: 12px; font-weight: 600; color: #1a73e8; margin-bottom: 6px; }
+          .g-input { width: 100%; box-sizing: border-box; padding: 13px 15px; border-radius: 8px; border: 1.5px solid #aecbfa; background: #f8fbff; color: #202124; font-size: 15.5px; outline: none; transition: all 0.15s; }
+          .g-input:focus { border: 2px solid #1a73e8; background: #ffffff; box-shadow: 0 0 0 3px rgba(66,133,244,0.15); }
           .g-hint { font-size: 12px; color: #5f6368; margin-top: 8px; line-height: 1.4; }
-          .g-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 32px; }
-          .g-badge { font-size: 12px; color: #5f6368; display: flex; align-items: center; gap: 5px; }
-          .g-submit { padding: 10px 24px; border-radius: 4px; border: none; background: #1a73e8; color: #ffffff; font-weight: 500; font-size: 14px; cursor: pointer; letter-spacing: 0.25px; }
-          .g-submit:hover { background: #1557b0; box-shadow: 0 1px 2px rgba(60,64,67,0.3); }
-          .g-footer { max-width: 448px; width: 100%; display: flex; justify-content: space-between; font-size: 12px; color: #5f6368; margin-top: 16px; padding: 0 4px; box-sizing: border-box; }
+          .g-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 26px; }
+          .g-badge { font-size: 12px; color: #137333; background: #e6f4ea; padding: 5px 10px; border-radius: 6px; font-weight: 600; }
+          .g-submit { padding: 11px 28px; border-radius: 8px; border: none; background: linear-gradient(135deg, #4285F4, #1a73e8); color: #ffffff; font-weight: 600; font-size: 14px; cursor: pointer; box-shadow: 0 4px 12px rgba(26,115,232,0.3); }
+          .g-submit:hover { background: #1557b0; }
+          .g-footer { max-width: 460px; width: 100%; display: flex; justify-content: space-between; font-size: 12px; color: #5f6368; margin-top: 16px; padding: 0 6px; box-sizing: border-box; }
         </style></head>
         <body>
+          <div class="google-top-ribbon"></div>
           <div class="g-login-card">
-            <svg width="48" height="48" viewBox="0 0 48 48" aria-hidden="true">
+            <div class="g-card-stripe"></div>
+            <svg width="46" height="46" viewBox="0 0 48 48" aria-hidden="true">
               <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
               <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
               <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
               <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
             </svg>
-            <h1 class="g-title">Sign in</h1>
-            <p class="g-subtitle">to continue to <strong>SPARK Architecture Studio</strong></p>
+            <div class="g-wordmark">
+              <span style="color:#4285F4">G</span><span style="color:#EA4335">o</span><span style="color:#FBBC05">o</span><span style="color:#4285F4">g</span><span style="color:#34A853">l</span><span style="color:#EA4335">e</span>
+              <span style="color:#5f6368; font-weight:500;">Cloud</span>
+            </div>
+            <h1 class="g-title">SPARK Architecture Studio</h1>
+            <p class="g-subtitle">Sign in with your corporate <strong>@google.com</strong> account</p>
+            <div class="g-pillars">
+              <span class="g-pill g-pill-blue">Gemini 3.8 AI</span>
+              <span class="g-pill g-pill-red">6R Strategy</span>
+              <span class="g-pill g-pill-yellow">FinOps TCO</span>
+              <span class="g-pill g-pill-green">Cloud WAF</span>
+            </div>
             <form method="POST" action="/auth/google-login">
               <div class="g-field-wrap">
-                <label class="g-label" for="g-email">Google Corporate Email (@google.com)</label>
+                <label class="g-label" for="g-email">Googler Corporate Email (@google.com)</label>
                 <input class="g-input" id="g-email" type="email" name="email" value="imedtra@google.com" placeholder="username@google.com" required autofocus>
                 <div class="g-hint">Protected by Google Cloud Armor WAF &bull; Restricted to <strong>@google.com</strong> Googlers</div>
               </div>
               <div class="g-actions">
-                <span class="g-badge">🔒 TLS 1.2+ &bull; Gemini 3.8</span>
-                <button type="submit" class="g-submit">Next</button>
+                <span class="g-badge">🛡️ Verified HTTPS</span>
+                <button type="submit" class="g-submit">Continue &rarr;</button>
               </div>
             </form>
           </div>
           <div class="g-footer">
             <span>Google Cloud EMEA OCE</span>
-            <span>Privacy &bull; Terms &bull; Internal Only</span>
+            <span>Privacy &bull; Terms &bull; Googlers Only</span>
           </div>
         </body></html>""",
         200,
