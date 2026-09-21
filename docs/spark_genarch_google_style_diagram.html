@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SPARK Architecture Modernization Studio — Google Cloud & GenArch Box Diagram</title>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --g-blue: #4285F4;
+    --g-blue-dark: #1A73E8;
+    --g-blue-bg: #E8F0FE;
+    --g-red: #EA4335;
+    --g-red-bg: #FCE8E6;
+    --g-yellow: #FBBC05;
+    --g-yellow-dark: #B06000;
+    --g-yellow-bg: #FEF7E0;
+    --g-green: #34A853;
+    --g-green-bg: #E6F4EA;
+    --g-bg: #F8F9FA;
+    --g-surface: #FFFFFF;
+    --g-border: #DADCE0;
+    --g-text: #202124;
+    --g-muted: #5F6368;
+  }
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    font-family: 'Google Sans', 'Roboto', sans-serif;
+    background: #FFFFFF;
+    color: var(--g-text);
+    padding: 16px;
+  }
+  /* Header Bar */
+  .arch-canvas-wrapper {
+    border: 1px solid var(--g-border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(60, 64, 67, 0.08);
+    background: #FFFFFF;
+  }
+  .color-strip {
+    height: 5px;
+    background: linear-gradient(90deg, #4285F4 0% 25%, #EA4335 25% 50%, #FBBC05 50% 75%, #34A853 75% 100%);
+  }
+  .arch-header {
+    background: var(--g-blue-dark);
+    color: #FFFFFF;
+    padding: 14px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .arch-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .gcp-logo-badge {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .arch-title {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.2px;
+  }
+  .arch-subtitle {
+    font-size: 12px;
+    color: #D2E3FC;
+    margin-top: 2px;
+  }
+  .arch-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .btn-genarch {
+    background: #FFFFFF;
+    color: var(--g-blue-dark);
+    border: none;
+    padding: 7px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    transition: all 0.15s ease;
+  }
+  .btn-genarch:hover {
+    background: #E8F0FE;
+  }
+  .btn-copy {
+    background: rgba(255, 255, 255, 0.16);
+    color: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    padding: 7px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .btn-copy:hover {
+    background: rgba(255, 255, 255, 0.26);
+  }
+
+  /* Main Google Cloud Box Grid */
+  .gcp-outer-boundary {
+    margin: 16px;
+    padding: 16px;
+    background: #F8F9FA;
+    border: 2px dashed #80868B;
+    border-radius: 12px;
+    position: relative;
+  }
+  .boundary-pill {
+    position: absolute;
+    top: -11px;
+    left: 18px;
+    background: #FFFFFF;
+    border: 1px solid #80868B;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #3C4043;
+    letter-spacing: 0.3px;
+  }
+
+  .zones-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-top: 8px;
+    align-items: stretch;
+  }
+  @media (max-width: 1100px) {
+    .zones-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 640px) {
+    .zones-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Google Zone Container Box */
+  .zone-box {
+    background: #FFFFFF;
+    border: 1.5px solid var(--g-border);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(60, 64, 67, 0.05);
+  }
+  .zone-box.blue { border-top: 5px solid var(--g-blue); }
+  .zone-box.red { border-top: 5px solid var(--g-red); }
+  .zone-box.yellow { border-top: 5px solid var(--g-yellow); }
+  .zone-box.green { border-top: 5px solid var(--g-green); }
+
+  .zone-header {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--g-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .zone-box.blue .zone-header { background: var(--g-blue-bg); color: #174EA6; }
+  .zone-box.red .zone-header { background: var(--g-red-bg); color: #A50E0E; }
+  .zone-box.yellow .zone-header { background: var(--g-yellow-bg); color: #B06000; }
+  .zone-box.green .zone-header { background: var(--g-green-bg); color: #0D652D; }
+
+  .zone-title {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .zone-step-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.85);
+  }
+
+  .zone-body {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+  }
+
+  /* Official GenArch GCP Card Style */
+  .gcp-card {
+    background: #FFFFFF;
+    border: 1px solid #DADCE0;
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+    position: relative;
+  }
+  .gcp-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(60, 64, 67, 0.12);
+    border-color: var(--g-blue);
+  }
+  .gcp-icon-box {
+    width: 34px;
+    height: 34px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 16px;
+  }
+  .icon-blue { background: var(--g-blue-bg); color: var(--g-blue-dark); }
+  .icon-red { background: var(--g-red-bg); color: var(--g-red); }
+  .icon-yellow { background: var(--g-yellow-bg); color: var(--g-yellow-dark); }
+  .icon-green { background: var(--g-green-bg); color: var(--g-green); }
+
+  .gcp-card-content {
+    flex: 1;
+    min-width: 0;
+  }
+  .gcp-card-type {
+    font-size: 9.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--g-muted);
+  }
+  .gcp-card-name {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--g-text);
+    margin: 1px 0 3px;
+  }
+  .gcp-card-desc {
+    font-size: 11px;
+    color: var(--g-muted);
+    line-height: 1.35;
+  }
+  .code-chip {
+    display: inline-block;
+    margin-top: 4px;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 10px;
+    background: #F1F3F4;
+    color: #3C4043;
+    padding: 1px 6px;
+    border-radius: 4px;
+    border: 1px solid #E8EAED;
+  }
+
+  /* Flow Connector Arrow between cards */
+  .card-flow-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--g-muted);
+    margin: -2px 0;
+  }
+  .card-flow-arrow span {
+    background: #F1F3F4;
+    padding: 1px 8px;
+    border-radius: 999px;
+    border: 1px solid #DADCE0;
+  }
+
+  /* Bottom Cross-Zone Data Pipeline Strip */
+  .cross-zone-pipeline {
+    margin: 0 16px 16px;
+    background: #FFFFFF;
+    border: 1px solid var(--g-border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .pipeline-node {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11.5px;
+    font-weight: 600;
+  }
+  .pipeline-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+  .pipeline-edge {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 10.5px;
+    color: var(--g-blue-dark);
+    background: var(--g-blue-bg);
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+<div class="arch-canvas-wrapper">
+  <div class="color-strip"></div>
+  <div class="arch-header">
+    <div class="arch-header-left">
+      <div class="gcp-logo-badge">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2L3 7v10l9 5 9-5V7l-9-5z" stroke="#1A73E8" stroke-width="2" fill="#E8F0FE"/>
+          <circle cx="12" cy="12" r="3.5" fill="#EA4335"/>
+        </svg>
+      </div>
+      <div>
+        <div class="arch-title">SPARK Architecture Modernization Studio — Google Cloud Box Architecture (GenArch Standard)</div>
+        <div class="arch-subtitle">Project: <strong>imed-test-project-1</strong> • Region: <strong>europe-west1</strong> • AI Engine: <strong>Vertex AI Gemini 3.8 (gemini-3-flash-preview)</strong></div>
+      </div>
+    </div>
+    <div class="arch-actions">
+      <button class="btn-copy" onclick="copyGenArchPrompt()" id="copyBtn">📋 Copy go/genarch Prompt</button>
+      <a class="btn-genarch" href="https://genarch.corp.goog" target="_blank" rel="noopener">✨ Open go/genarch ↗</a>
+    </div>
+  </div>
+
+  <!-- Outer Google Cloud Boundary Box -->
+  <div class="gcp-outer-boundary">
+    <div class="boundary-pill">☁️ Google Cloud Organization (Argolis — imed-test-project-1)</div>
+
+    <div class="zones-grid">
+      <!-- ZONE 1: EDGE & IDENTITY (BLUE) -->
+      <div class="zone-box blue">
+        <div class="zone-header">
+          <span class="zone-title">1. Edge & Identity Gate</span>
+          <span class="zone-step-badge">Ingress</span>
+        </div>
+        <div class="zone-body">
+          <div class="gcp-card">
+            <div class="gcp-icon-box icon-blue">📥</div>
+            <div class="gcp-card-content">
+              <div class="gcp-card-type">Discovery Sources</div>
+              <div class="gcp-card-name">Multi-Cloud Telemetry</div>
+              <div class="gcp-card-desc">RVTools VMware CSV, AWS Migration Hub, Azure Migrate & Architecture PDFs.</div>
+              <span class="code-chip">POST /api/upload-csv</span>
+            </div>
+          </div>
+
+          <div class="card-flow-arrow">↓ <span>HTTPS TLS 1.3</span></div>
+
+          <div class="gcp-card">
+            <div class="gcp-icon-box icon-blue">🌐</div>
+            <div class="gcp-card-content">
+              <div class="gcp-card-type">Cloud Load Balancing</div>
+              <div class="gcp-card-name">Global External HTTPS LB</div>
+              <div class="gcp-card-desc">Managed SSL cert & Serverless NEG routing to Cloud Run.</div>
+              <span class="code-chip">34.110.219.221.nip.io</span>
+            </div>
+          </div>
+
+          <div class="card-flow-arrow">↓ <span>Session / IAP Header</span></div>
+
+          <div class="gcp-card">
+            <div class="gcp-icon-box icon-blue">🛡️</div>
+            <div class="gcp-card-content">
+              <div class="gcp-card-type">Identity & Access</div>
+              <div class="gcp-card-name">Googler Identity Gate</div>
+              <div class="gcp-card-desc">White Material 3 `@google.com` gate + `X-Goog-Authenticated-User-Email` IAP check.</div>
+              <span class="code-chip">spark_googler_session</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ZONE 2: CLOUD RUN ANALYTICAL CORE (RED) -->
+      <div class="zone-box red">
+        <div class="zone-header">
+          <span class="zone-title">2. Cloud Run Core</span>
+          <span class="zone-step-badge">Compute</span>
+        </div>
+        <div class="zone-body">
+          <div class="gcp-card">
+            <div class="gcp-icon-box icon-red">⚙️</div>
+            <div class="gcp-card-content">
+              <div class="gcp-card-type">Cloud Run Service</div>
+              <div class="gcp-card-name">spark-arch-studio (Flask)</div>
+              <div class="gcp-card-desc">Serverless Python 3.11 + Gunicorn runtime hosting the 6-Tab Google UI & REST APIs.</div>
+              <span class="code-chip">app/main.py</span>
+            </div>
+          </div>
+
+          <div class="gcp-card">
+            <div class="gcp-icon-box icon-red">🧭</div>
+            <div class="gcp-card-content">
+              <div class="gcp-card-type">Deterministic Assessment</div>
+              <div class="gcp-card-name">Rule-Based 6R & Sizing</div>
+              <div class="gcp-card-desc">OS EOL detector, right-sizing (N2/C3/M3), 3-Year CUD FinOps TCO & 6R classifier.</div>
+              <span class="code-chip">POST /api/assess</span>
+            </div>
+          </div>
+
+          <div class="gcp-card">
+            <div class="gcp-icon-box icon-red">🌊</div>
+            <div class="gcp-card-content">
+              <div class="gcp-card-type">Topology & WAF Engine</div>
+              <div class="gcp-card-name">Wave Planner & WAF Scorer</div>
+              <div class="gcp-card-desc">Sequences servers into Wave 1/2/3 blast-radius groups & scores 5 GCP WAF pillars.</div>
+              <span class="code-chip">Tab 2 & Tab 6</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ZONE 3: VERTEX AI GEMINI 3.8 (YELLOW) -->
+      <div class="zone-box yellow">
+        <div class="zone-header">
+          <span class="zone-title">3. Vertex AI Intelligence</span>
+          <span class="zone-step-badge">GenAI</span>
+        </div>
+        <div class="zone-body">
+          <div class="gcp-card">
+            <div class="gcp-icon-box icon-yellow">🔑</div>
+            <div class="gcp-card-content">
+              <div class="gcp-card-type">Keyless Security</div>
+              <div class="gcp-card-name">Cloud Run ADC Identity</div>
+              <div class="gcp-card-desc">Zero API keys in code. Authenticates via Google Metadata Server OAuth2 token.</div>
+              <span class="code-chip">google-genai SDK</span>
+            </div>
+          </div>
+
+          <div class="card-flow-arrow">↓ <span>gRPC / Vertex AI</span></div>
+
+          <div class="gcp-card">
+            <div class="gcp-icon-box icon-yellow">✨</div>
+            <div class="gcp-card-content">
+              <div class="gcp-card-type">Vertex AI Foundation Model</div>
+              <div class="gcp-card-name">Gemini 3.8 Engine</div>
+              <div class="gcp-card-desc">Synthesizes target Hub-and-Spoke blueprints, executive roadmaps & WAF remediations.</div>
+              <span class="code-chip">gemini-3-flash-preview</span>
+            </div>
+          </div>
+
+          <div class="gcp-card">
+            <div class="gcp-icon-box icon-yellow">🔄</div>
+            <div class="gcp-card-content">
+              <div class="gcp-card-type">High Availability</div>
+              <div class="gcp-card-name">Multi-Model Fallback</div>
+              <div class="gcp-card-desc">Graceful cascade from `gemini-3-flash-preview` to `gemini-2.5-flash` & deterministic rules.</div>
+              <span class="code-chip">POST /api/gemini-architect</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ZONE 4: TARGET LANDING ZONE & IAC (GREEN) -->
+      <div class="zone-box green">
+        <div class="zone-header">
+          <span class="zone-title">4. Target GCP Landing Zone</span>
+          <span class="zone-step-badge">Output IaC</span>
+        </div>
+        <div class="zone-body">
+          <div class="gcp-card">
+            <div class="gcp-icon-box icon-green">📦</div>
+            <div class="gcp-card-content">
+              <div class="gcp-card-type">Cloud Foundation Fabric</div>
+              <div class="gcp-card-name">Terraform Bundle (`main.tf`)</div>
+              <div class="gcp-card-desc">Auto-generated HCL modules for Shared VPC, IAM, Cloud Armor, GKE, GCE & Cloud SQL.</div>
+              <span class="code-chip">Tab 5 Export</span>
+            </div>
+          </div>
+
+          <div class="gcp-card">
+            <div class="gcp-icon-box icon-green">🛡️</div>
+            <div class="gcp-card-content">
+              <div class="gcp-card-type">Network Hub VPC</div>
+              <div class="gcp-card-name">Cloud Armor, NAT & HA VPN</div>
+              <div class="gcp-card-desc">Centralized ingress WAF, egress NAT, Private Service Connect & hybrid connectivity.</div>
+              <span class="code-chip">Hub-and-Spoke</span>
+            </div>
+          </div>
+
+          <div class="gcp-card">
+            <div class="gcp-icon-box icon-green">🚀</div>
+            <div class="gcp-card-content">
+              <div class="gcp-card-type">Modernized Workload Spokes</div>
+              <div class="gcp-card-name">GKE, GCE, Cloud SQL & BQ</div>
+              <div class="gcp-card-desc">App Tier on GKE Autopilot / GCE MIGs + Data Tier on Cloud SQL HA, AlloyDB & BigQuery.</div>
+              <span class="code-chip">Prod & Non-Prod Spokes</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- End-to-End Typed Edge Flow Bar -->
+  <div class="cross-zone-pipeline">
+    <div class="pipeline-node"><span class="pipeline-dot" style="background:#4285F4;"></span> 1. Edge Ingress</div>
+    <div class="pipeline-edge">CSV / PDF Telemetry ➔</div>
+    <div class="pipeline-node"><span class="pipeline-dot" style="background:#EA4335;"></span> 2. Cloud Run 6R & WAF</div>
+    <div class="pipeline-edge">Server Fleet Context (ADC) ➔</div>
+    <div class="pipeline-node"><span class="pipeline-dot" style="background:#FBBC05;"></span> 3. Vertex AI Gemini 3.8</div>
+    <div class="pipeline-edge">Blueprint + HCL JSON ➔</div>
+    <div class="pipeline-node"><span class="pipeline-dot" style="background:#34A853;"></span> 4. Hub-and-Spoke Terraform</div>
+  </div>
+</div>
+
+<textarea id="genarchPromptText" style="position:absolute;left:-9999px;">Create a left-to-right Google Cloud architecture diagram using GCP Cards and 4 grouped boundary containers for "SPARK Architecture Modernization Studio (Project: imed-test-project-1, Region: europe-west1)":
+
+1. Group "1. Edge Security & Identity Gate" (Google Blue border):
+   - Node "Multi-Cloud Discovery Telemetry": RVTools CSV, AWS Migration Hub, Azure Migrate, Architecture PDF
+   - Node "Global External HTTPS Load Balancer": GCP Cloud Load Balancing (34.110.219.221.nip.io) with Managed SSL Certificate and Serverless NEG
+   - Node "Googler Identity Gate": IAP JWT Header Verification (X-Goog-Authenticated-User-Email) and @google.com Session Cookie Gate
+
+2. Group "2. Cloud Run Analytical Core (europe-west1)" (Google Red border):
+   - Node "spark-arch-studio (Cloud Run)": Serverless Python 3.11 Flask & Gunicorn container
+   - Node "Rule-Based 6R & FinOps Engine": OS EOL detection, N2/C3/M3 VM right-sizing, 3-Year CUD TCO calculator
+   - Node "Dependency Wave & WAF Scorer": 3-Wave blast-radius sequencer and 5-Pillar Google Cloud Well-Architected Framework evaluator
+
+3. Group "3. Keyless Vertex AI Intelligence" (Google Yellow border):
+   - Node "Cloud Run Default Service Account": Keyless Application Default Credentials (ADC) via Metadata Server
+   - Node "Vertex AI Gemini 3.8 (gemini-3-flash-preview)": Generative AI blueprint synthesizer with automatic fallback to gemini-2.5-flash
+
+4. Group "4. Target Hub-and-Spoke Landing Zone" (Google Green border):
+   - Node "Cloud Foundation Fabric Generator": Production Terraform (main.tf, variables.tf)
+   - Node "Network Hub VPC": Cloud Armor WAF, Cloud NAT, Cloud Router, HA VPN
+   - Node "Workload Spokes (Compute & Data)": GKE Autopilot, Compute Engine MIGs, Cloud SQL HA / AlloyDB, BigQuery & Vertex AI
+
+Edges (left-to-right):
+- "Multi-Cloud Discovery Telemetry" -> "Global External HTTPS Load Balancer" : "HTTPS POST /api/upload-csv (TLS 1.3)"
+- "Global External HTTPS Load Balancer" -> "Googler Identity Gate" : "Serverless NEG Request"
+- "Googler Identity Gate" -> "spark-arch-studio (Cloud Run)" : "Verified @google.com Session"
+- "spark-arch-studio (Cloud Run)" -> "Rule-Based 6R & FinOps Engine" : "Normalized Server Fleet"
+- "Rule-Based 6R & FinOps Engine" -> "Dependency Wave & WAF Scorer" : "6R Strategy & Right-Sizing"
+- "spark-arch-studio (Cloud Run)" -> "Cloud Run Default Service Account" : "Request OAuth2 Token"
+- "Cloud Run Default Service Account" -> "Vertex AI Gemini 3.8 (gemini-3-flash-preview)" : "gRPC GenerateContentRequest"
+- "Vertex AI Gemini 3.8 (gemini-3-flash-preview)" -> "Cloud Foundation Fabric Generator" : "Target Blueprint & WAF Remediation JSON"
+- "Cloud Foundation Fabric Generator" -> "Network Hub VPC" : "Terraform Apply (Hub VPC)"
+- "Network Hub VPC" -> "Workload Spokes (Compute & Data)" : "VPC Peering / Private Service Connect"</textarea>
+
+<script>
+function copyGenArchPrompt() {
+  const el = document.getElementById('genarchPromptText');
+  el.select();
+  document.execCommand('copy');
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(el.value);
+  }
+  const btn = document.getElementById('copyBtn');
+  btn.textContent = '✅ Copied go/genarch Prompt!';
+  setTimeout(() => {
+    btn.textContent = '📋 Copy go/genarch Prompt';
+  }, 2500);
+}
+</script>
+</body>
+</html>
