@@ -1426,11 +1426,41 @@ function renderTab5WavesAndWAF(data) {
     archBox.innerHTML = `
       <div class="panel-header" style="margin-bottom:0.95rem;">
         <div>
-          <span class="badge-6r badge-blue" style="margin-bottom:0.35rem;">Vertex AI 6R Target Architecture Blueprint &bull; Cloud Foundation Fabric</span>
-          <h3 class="panel-title" style="margin:0.2rem 0 0 0; font-size:1.05rem;">Target Google Cloud Hub-and-Spoke Landing Zone (Mapped by 6R Treatment)</h3>
+          <span class="badge-6r badge-blue" style="margin-bottom:0.35rem;">End-to-End Platform &amp; Target Landing Zone Architecture &bull; Gemini 3.8</span>
+          <h3 class="panel-title" style="margin:0.2rem 0 0 0; font-size:1.05rem;">Full System Architecture &amp; Target Google Cloud Hub-and-Spoke Landing Zone</h3>
         </div>
-        <span class="badge-6r badge-emerald">Shared VPC + Cloud Armor WAF + KMS</span>
+        <span class="badge-6r badge-emerald">TLS 1.2+ &bull; Cloud Armor WAF &bull; Keyless Vertex AI</span>
       </div>
+
+      <!-- 5-Layer End-to-End Platform Architecture Pipeline (Google 4-Color Flow) -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:0.75rem; margin-bottom:1.15rem; padding:0.9rem; background:var(--bg-elevated); border:1px solid var(--border-subtle); border-radius:10px;">
+        <div style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-top:4px solid #4285F4; border-radius:8px; padding:0.75rem;">
+          <div style="font-size:0.7rem; font-weight:700; color:#4285F4; text-transform:uppercase;">Layer 1 &bull; Client &amp; Telemetry</div>
+          <div style="font-size:0.84rem; font-weight:700; color:var(--text-primary); margin:0.2rem 0;">Googler &amp; Discovery CSVs</div>
+          <div style="font-size:0.73rem; color:var(--text-secondary);">@google.com Browser, VMware RVTools (<code>vInfo</code>), Migration Center &amp; DrMigrate exports.</div>
+        </div>
+        <div style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-top:4px solid #EA4335; border-radius:8px; padding:0.75rem;">
+          <div style="font-size:0.7rem; font-weight:700; color:#EA4335; text-transform:uppercase;">Layer 2 &bull; Edge Security</div>
+          <div style="font-size:0.84rem; font-weight:700; color:var(--text-primary); margin:0.2rem 0;">Global HTTPS LB + WAF</div>
+          <div style="font-size:0.73rem; color:var(--text-secondary);">Managed TLS 1.2+ (<code>MODERN</code> policy), Cloud Armor L7 WAF Rule 1000 &amp; Serverless NEG.</div>
+        </div>
+        <div style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-top:4px solid #FBBC05; border-radius:8px; padding:0.75rem;">
+          <div style="font-size:0.7rem; font-weight:700; color:#b06000; text-transform:uppercase;">Layer 3 &bull; Cloud Run Core</div>
+          <div style="font-size:0.84rem; font-weight:700; color:var(--text-primary); margin:0.2rem 0;">SPARK 6R &amp; FinOps Engine</div>
+          <div style="font-size:0.73rem; color:var(--text-secondary);">HMAC-SHA256 @google.com Gatekeeper, Zombie VM detector, Gen4 Right-Sizer &amp; 3-Yr CUD TCO Modeler.</div>
+        </div>
+        <div style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-top:4px solid #34A853; border-radius:8px; padding:0.75rem;">
+          <div style="font-size:0.7rem; font-weight:700; color:#34A853; text-transform:uppercase;">Layer 4 &bull; Vertex AI Global</div>
+          <div style="font-size:0.84rem; font-weight:700; color:var(--text-primary); margin:0.2rem 0;">Keyless Gemini 3.8 Agents</div>
+          <div style="font-size:0.73rem; color:var(--text-secondary);">Metadata ADC Token Broker &rarr; Structured JSON 6R Recommender + Grounded Architecture Copilot.</div>
+        </div>
+        <div style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-top:4px solid #1a73e8; border-radius:8px; padding:0.75rem;">
+          <div style="font-size:0.7rem; font-weight:700; color:#1a73e8; text-transform:uppercase;">Layer 5 &bull; IaC &amp; Landing Zone</div>
+          <div style="font-size:0.84rem; font-weight:700; color:var(--text-primary); margin:0.2rem 0;">Cloud Foundation Fabric</div>
+          <div style="font-size:0.73rem; color:var(--text-secondary);">Automated <code>main.tf</code> generator across 100 Gbps Shared VPC Hub &amp; 5 Spoke Subnets below.</div>
+        </div>
+      </div>
+
       <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:0.95rem;">
         ${Object.entries(by6R).map(([strat, list]) => {
           const m = zoneMeta[strat] || { title: `${strat} Landing Zone`, icon: '☁️', color: '#4285F4', badgeClass: 'badge-blue', subnet: 'vpc-prod-spoke' };
